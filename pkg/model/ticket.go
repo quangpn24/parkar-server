@@ -7,6 +7,7 @@ import (
 
 type Ticket struct {
 	BaseModel
+	UserId           uuid.UUID `json:"user_id"` // dung cho muc dich truy van
 	VehicleId        uuid.UUID `json:"vehicle_id"`
 	ParkingLotId     uuid.UUID `json:"parking_lot_id"`
 	ParkingSlotId    uuid.UUID `json:"parking_slot_id"`
@@ -24,4 +25,12 @@ type Ticket struct {
 
 func (t *Ticket) TableName() string {
 	return "ticket"
+}
+
+type CancelTicketRequest struct {
+	ListTicketId []string `json:"list_ticket_id"`
+}
+type GetListTicketParam struct {
+	UserId string  `json:"user_id" valid:"Required"`
+	State  *string `json:"state"`
 }

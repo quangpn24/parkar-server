@@ -35,9 +35,11 @@ func NewService() *Service {
 
 	//service
 	authService := service2.NewAuthService(repoPG)
+	favoriteService := service2.NewFavoriteService(repoPG)
 
 	//handler
 	authHandler := handlers.NewAuthHandler(authService)
+	favoriteHandler := handlers.NewFavoriteHandler(favoriteService)
 
 	v1Api := s.Router.Group("/api/v1")
 	swaggerApi := s.Router.Group("/")
@@ -47,6 +49,11 @@ func NewService() *Service {
 
 	//auth
 	v1Api.POST("/user/login", ginext.WrapHandler(authHandler.Login))
+
+	//favorite
+	v1Api.POST("/favorite", ginext.WrapHandler(favoriteHandler.Create))
+	v1Api.GET("/favorite/user/:idUser", ginext.WrapHandler(favoriteHandler.GetAllFavoriteParkingByUser))
+	v1Api.DELETE("/favorite", ginext.WrapHandler(favoriteHandler.DeleteOne))
 
 	// Migrate
 	migrateHandler := handlers.NewMigrationHandler(db)

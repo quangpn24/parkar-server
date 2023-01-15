@@ -40,6 +40,20 @@ type PGInterface interface {
 
 	//user
 	GetOneUserByPhone(ctx context.Context, phoneNumber string, tx *gorm.DB) (*model.User, error)
+	CreateUser(ctx context.Context, user *model.User, tx *gorm.DB) error
+
+	//favorite
+	GetAllFavoriteParkingByUser(ctx context.Context, userId string, tx *gorm.DB) (res []model.Favorite, err error)
+	CreateFavorite(ctx context.Context, favorite *model.Favorite, tx *gorm.DB) error
+	DeleteOneFavorite(ctx context.Context, req model.FavoriteRequest, tx *gorm.DB) error
+
+	//ticket
+	CreateTicket(ctx context.Context, req *model.Ticket, tx *gorm.DB) error
+	CancelTicket(ctx context.Context, req model.CancelTicketRequest, tx *gorm.DB) error
+	GetAllTicket(ctx context.Context, req model.GetListTicketParam, tx *gorm.DB) ([]model.Ticket, error)
+
+	//token
+	CreateRefreshToken(ctx context.Context, refreshToken *model.RefreshToken, tx *gorm.DB) error
 }
 
 type RepoPG struct {
