@@ -1,11 +1,13 @@
 package route
 
 import (
+	"fmt"
 	"github.com/caarlos0/env/v6"
 	swaggerFiles "github.com/swaggo/files"
 	swagger "github.com/swaggo/gin-swagger"
 	"gitlab.com/goxp/cloud0/ginext"
 	"gitlab.com/goxp/cloud0/service"
+	"parkar-server/conf"
 	"parkar-server/pkg/handlers"
 	"parkar-server/pkg/repo"
 	service2 "parkar-server/pkg/service"
@@ -27,6 +29,14 @@ func NewService() *Service {
 	}
 	// repo
 	_ = env.Parse(s.setting)
+	s.Config.DB.DSN = fmt.Sprintf(
+		"host=%s port=%s user=%s dbname=%s password=%s connect_timeout=5",
+		conf.GetConfig().DBHost,
+		conf.GetConfig().DBPort,
+		conf.GetConfig().DBUser,
+		conf.GetConfig().DBName,
+		conf.GetConfig().DBPass,
+	)
 	db := s.GetDB()
 	if s.setting.DbDebugEnable {
 		db = db.Debug()
