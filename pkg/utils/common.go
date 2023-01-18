@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"database/sql/driver"
 	"fmt"
 	"github.com/astaxie/beego/validation"
 	"github.com/gin-gonic/gin"
@@ -12,6 +13,7 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func StrDelimitForSum(flt float64, currency string) string {
@@ -58,34 +60,6 @@ func ParseStringIDFromUri(c *gin.Context) *string {
 		return nil
 	}
 	return &tID.ID[0]
-}
-
-func ResizeImage(link string, w, h int) string {
-	if link == "" || w == 0 || !strings.Contains(link, LINK_IMAGE_RESIZE) {
-		return link
-	}
-
-	size := getSizeImage(w, h)
-
-	env := "/finan-dev/"
-	linkTemp := strings.Split(link, "/finan-dev/")
-	if len(linkTemp) != 2 {
-		linkTemp = strings.Split(link, "/finan/")
-		env = "/finan/"
-	}
-
-	if len(linkTemp) == 2 {
-		url := linkTemp[0] + "/v2/" + size + env + linkTemp[1]
-		return strings.ReplaceAll(url, " ", "%20")
-	}
-	return strings.ReplaceAll(link, " ", "%20")
-}
-
-func getSizeImage(w, h int) string {
-	if h == 0 {
-		return "w" + strconv.Itoa(w)
-	}
-	return strconv.Itoa(w) + "x" + strconv.Itoa(h)
 }
 
 func ConvertVNPhoneFormat(phone string) string {
@@ -170,4 +144,58 @@ func CheckRequireValid(ob interface{}) error {
 func Hash(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
 	return string(bytes), err
+}
+
+type Time struct {
+	time.Time
+}
+
+func (t Time) Value() (driver.Value, error) {
+	if !t.IsSet() {
+		return "null", nil
+	}
+	return t.Time, nil
+}
+
+func (t *Time) IsSet() bool {
+	return t.UnixNano() != (time.Time{}).UnixNano()
+}
+
+func Sync(from interface{}, to interface{}) interface{} {
+	_from := reflect.ValueOf(from)
+	_fromType := _from.Type()
+	_to := reflect.ValueOf(to)
+
+	for i := 0; i < _from.NumField(); i++ {
+		fromName := _fromType.Field(i).Name
+		field := _to.Elem().FieldByName(fromName)
+		if !_from.Field(i).IsNil() && field.IsValid() && field.CanSet() {
+			fromValue := _from.Field(i).Elem()
+			fromType := reflect.TypeOf(fromValue.Interface())
+			if fromType.String() == "uuid.UUID" {
+				if fromValue.Interface() != uuid.Nil {
+					field.Set(fromValue)
+				}
+			} else if fromType.String() == "string" {
+				if field.Kind() == reflect.Ptr {
+					tmp := fromValue.String()
+					field.Set(reflect.ValueOf(&tmp))
+				} else {
+					field.Set(fromValue)
+				}
+			} else if fromType.String() == "service.Time" {
+				tmp := fromValue.Interface().(Time)
+				if tmp.IsSet() {
+					if field.Kind() == reflect.Ptr {
+						field.Set(reflect.ValueOf(&tmp))
+					} else {
+						field.Set(fromValue)
+					}
+				}
+			} else {
+				field.Set(fromValue)
+			}
+		}
+	}
+	return to
 }

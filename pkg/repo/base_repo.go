@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/google/uuid"
 	"math"
 	"net/http"
 	"parkar-server/pkg/model"
@@ -41,12 +42,19 @@ type PGInterface interface {
 	//user
 	GetOneUserByPhone(ctx context.Context, phoneNumber string, tx *gorm.DB) (*model.User, error)
 	CreateUser(ctx context.Context, user *model.User, tx *gorm.DB) error
+	GetOneUserById(ctx context.Context, id uuid.UUID, tx *gorm.DB) (*model.User, error)
+	UpdateUser(ctx context.Context, user *model.User, tx *gorm.DB) error
+	DeleteUser(ctx context.Context, id string, tx *gorm.DB) error
 
 	//favorite
 	GetAllFavoriteParkingByUser(ctx context.Context, userId string, tx *gorm.DB) (res []model.Favorite, err error)
 	CreateFavorite(ctx context.Context, favorite *model.Favorite, tx *gorm.DB) error
 	DeleteOneFavorite(ctx context.Context, req model.FavoriteRequest, tx *gorm.DB) error
 
+	//time frame
+	GetAllTimeFrame(ctx context.Context, req model.GetListTimeFrameParam, tx *gorm.DB) (res *model.ListTimeFrame, err error)
+	CreateMultiTimeFrame(ctx context.Context, timeFrame []model.TimeFrame, tx *gorm.DB) (err error)
+	DeleteTimeFrameByParkingLotID(ctx context.Context, parkingLotID string, tx *gorm.DB) (err error)
 	//ticket
 	CreateTicket(ctx context.Context, req *model.Ticket, tx *gorm.DB) error
 	CancelTicket(ctx context.Context, req model.CancelTicketRequest, tx *gorm.DB) error
@@ -54,6 +62,34 @@ type PGInterface interface {
 
 	//token
 	CreateRefreshToken(ctx context.Context, refreshToken *model.RefreshToken, tx *gorm.DB) error
+
+	// Parking lot
+	CreateParkingLot(ctx context.Context, req *model.ParkingLot) error
+	GetOneParkingLot(ctx context.Context, id uuid.UUID) (model.ParkingLot, error)
+	GetListParkingLot(ctx context.Context, req model.ListParkingLotReq) (model.ListParkingLotRes, error)
+	UpdateParkingLot(ctx context.Context, req *model.ParkingLot) error
+	DeleteParkingLot(ctx context.Context, id uuid.UUID) error
+
+	// Block
+	CreateBlock(ctx context.Context, req *model.Block) error
+	GetOneBlock(ctx context.Context, id uuid.UUID) (model.Block, error)
+	GetListBlock(ctx context.Context, req model.ListBlockReq) (model.ListBlockRes, error)
+	UpdateBlock(ctx context.Context, req *model.Block) error
+	DeleteBlock(ctx context.Context, id uuid.UUID) error
+
+	// ParkingSlot
+	CreateParkingSlot(ctx context.Context, req *model.ParkingSlot) error
+	GetOneParkingSlot(ctx context.Context, id uuid.UUID) (model.ParkingSlot, error)
+	GetListParkingSlot(ctx context.Context, req model.ListParkingSlotReq) (model.ListParkingSlotRes, error)
+	UpdateParkingSlot(ctx context.Context, req *model.ParkingSlot) error
+	DeleteParkingSlot(ctx context.Context, id uuid.UUID) error
+
+	// Vehicle
+	CreateVehicle(ctx context.Context, req *model.Vehicle) error
+	GetOneVehicle(ctx context.Context, id uuid.UUID) (model.Vehicle, error)
+	GetListVehicle(ctx context.Context, req model.ListVehicleReq) (model.ListVehicleRes, error)
+	UpdateVehicle(ctx context.Context, req *model.Vehicle) error
+	DeleteVehicle(ctx context.Context, id uuid.UUID) error
 }
 
 type RepoPG struct {

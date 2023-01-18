@@ -7,13 +7,13 @@ import (
 // AppConfig presents app conf
 type AppConfig struct {
 	AppEnv    string `env:"APP_ENV" envDefault:"dev"`
-	Port      string `env:"PORT" envDefault:"8000"`
+	Port      string `env:"PORT" envDefault:"8088"`
 	LogFormat string `env:"LOG_FORMAT" envDefault:"text"`
-	DBHost    string `env:"DB_HOST" envDefault:""`
+	DBHost    string `env:"DB_HOST" envDefault:"localhost"`
 	DBPort    string `env:"DB_PORT" envDefault:"5432"`
-	DBUser    string `env:"DB_USER" envDefault:""`
-	DBPass    string `env:"DB_PASS" envDefault:""`
-	DBName    string `env:"DB_NAME" envDefault:""`
+	DBUser    string `env:"DB_USER" envDefault:"postgres"`
+	DBPass    string `env:"DB_PASS" envDefault:"1"`
+	DBName    string `env:"DB_NAME" envDefault:"postgres"`
 	EnableDB  string `env:"ENABLE_DB" envDefault:"true"`
 }
 
@@ -24,5 +24,8 @@ func SetEnv() {
 }
 
 func LoadEnv() AppConfig {
+	return config
+}
+func GetConfig() AppConfig {
 	return config
 }

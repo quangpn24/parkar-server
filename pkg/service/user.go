@@ -2,34 +2,57 @@ package service
 
 import (
 	"context"
+	"github.com/google/uuid"
 	"parkar-server/pkg/model"
 	"parkar-server/pkg/repo"
+	"parkar-server/pkg/utils"
+	"parkar-server/pkg/valid"
 )
 
-type VehicleService struct {
+type UserService struct {
 	repo repo.PGInterface
 }
 
-func NewVehicleService(repo repo.PGInterface) VehicleServiceInterface {
-	return &VehicleService{repo: repo}
+func NewUserService(repo repo.PGInterface) UserServiceInterface {
+	return &UserService{repo: repo}
 }
 
-type VehicleServiceInterface interface {
-	CreateTicket(ctx context.Context, ticket *model.Ticket) (*model, error)
-	GetAllTicket(ctx context.Context, req model.GetListTicketParam) ([]model.Ticket, error)
+type UserServiceInterface interface {
+	GetUserById(ctx context.Context, id uuid.UUID) (*model.User, error)
+	CheckDuplicatePhone(ctx context.Context, phoneNumber string) (bool, error)
+	UpdateUser(ctx context.Context, userReq model.UserReq) (*model.User, error)
+	DeleteUser(ctx context.Context, id string) error
 }
 
-func (s *VehicleService) CreateTicket(ctx context.Context, ticket *model.Ticket) (*model.Ticket, error) {
-	err := s.repo.CreateTicket(ctx, ticket, nil)
+func (s *UserService) GetUserById(ctx context.Context, id uuid.UUID) (*model.User, error) {
+	rs, err := s.repo.GetOneUserById(ctx, id, nil)
 	if err != nil {
 		return nil, err
 	}
-	return ticket, nil
+	return rs, nil
 }
-func (s *VehicleService) GetAllTicket(ctx context.Context, req model.GetListTicketParam) ([]model.Ticket, error) {
-	res, err := s.repo.GetAllTicket(ctx, req, nil)
+func (s *UserService) CheckDuplicatePhone(ctx context.Context, phone string) (bool, error) {
+	rs, err := s.repo.GetOneUserByPhone(ctx, phone, nil)
+	if err != nil {
+		return false, err
+	}
+	if rs != nil {
+		return true, nil
+	}
+	return false, nil
+}
+func (s *UserService) UpdateUser(ctx context.Context, userReq model.UserReq) (*model.User, error) {
+	user, err := s.repo.GetOneUserById(ctx, valid.UUID(userReq.ID), nil)
 	if err != nil {
 		return nil, err
 	}
-	return res, nil
+
+	utils.Sync(userReq, &user)
+	if err := s.repo.UpdateUser(ctx, user, nil); err != nil {
+		return nil, err
+	}
+	return user, nil
+}
+func (s *UserService) DeleteUser(ctx context.Context, id string) error {
+	return s.repo.DeleteUser(ctx, id, nil)
 }

@@ -14,7 +14,7 @@ type BaseModel struct {
 	UpdaterID *uuid.UUID      `json:"updater_id,omitempty" gorm:"type:uuid"`
 	CreatedAt time.Time       `gorm:"column:created_at;default:CURRENT_TIMESTAMP" json:"created_at"`
 	UpdatedAt time.Time       `gorm:"column:updated_at;default:CURRENT_TIMESTAMP" json:"updated_at"`
-	DeletedAt *gorm.DeletedAt `json:"deleted_at,omitempty"  swaggertype:"string"`
+	DeletedAt *gorm.DeletedAt `json:"deleted_at,omitempty" swaggertype:"string"`
 }
 
 type UriParse struct {

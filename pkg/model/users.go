@@ -1,6 +1,8 @@
 package model
 
-import "github.com/google/uuid"
+import (
+	"github.com/google/uuid"
+)
 
 type User struct {
 	BaseModel
@@ -25,4 +27,14 @@ type LoginResponse struct {
 	PhoneNumber  string    `json:"phone_number"`
 	DisplayName  string    `json:"display_name"`
 	Id           uuid.UUID `json:"id"`
+}
+type CheckPhoneReq struct {
+	PhoneNumber string `json:"phone_number" valid:"Required"`
+}
+type UserReq struct {
+	ID          *uuid.UUID `json:"id" valid:"Required"`
+	DisplayName *string    `json:"display_name"`
+	ImageUrl    *string    `json:"image_url"`
+	Password    *string    `json:"password"`
+	PhoneNumber *string    `json:"phone_number"`
 }
