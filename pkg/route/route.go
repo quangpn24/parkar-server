@@ -45,17 +45,23 @@ func NewService() *Service {
 
 	//service
 	authService := service2.NewAuthService(repoPG)
+	favoriteService := service2.NewFavoriteService(repoPG)
 	lotService := service2.NewParkingLotService(repoPG)
 	blockService := service2.NewBlockService(repoPG)
 	slotService := service2.NewParkingSlotService(repoPG)
 	vehicleService := service2.NewVehicleService(repoPG)
+	userService := service2.NewUserService(repoPG)
+	timeFrameService := service2.NewTimeFrameService(repoPG)
 
 	//handler
 	authHandler := handlers.NewAuthHandler(authService)
+	favoriteHandler := handlers.NewFavoriteHandler(favoriteService)
 	lotHandler := handlers.NewParkingLotHandler(lotService)
 	blockHandler := handlers.NewBlockHandler(blockService)
 	slotHandler := handlers.NewParkingSlotHandler(slotService)
 	vehicleHandler := handlers.NewVehicleHandler(vehicleService)
+	userHandler := handlers.NewUserHandler(userService)
+	timeFrameHandler := handlers.NewTimeFrameHandler(timeFrameService)
 
 	v1Api := s.Router.Group("/api/v1")
 	swaggerApi := s.Router.Group("/")
@@ -65,6 +71,22 @@ func NewService() *Service {
 
 	//auth
 	v1Api.POST("/user/login", ginext.WrapHandler(authHandler.Login))
+
+	//user
+	v1Api.GET("/user/:id", ginext.WrapHandler(userHandler.GetOneUserById))
+	v1Api.POST("/user/check-phone", ginext.WrapHandler(userHandler.CheckDuplicatePhone))
+	v1Api.PUT("/user/:id", ginext.WrapHandler(userHandler.UpdateUser))
+	v1Api.DELETE("/user/:id", ginext.WrapHandler(userHandler.DeleteUser))
+
+	//favorite
+	v1Api.POST("/favorite", ginext.WrapHandler(favoriteHandler.Create))
+	v1Api.GET("/favorite/user/:idUser", ginext.WrapHandler(favoriteHandler.GetAllFavoriteParkingByUser))
+	v1Api.DELETE("/favorite", ginext.WrapHandler(favoriteHandler.DeleteOne))
+
+	//time frame
+	v1Api.GET("/time-frame/get-all", ginext.WrapHandler(timeFrameHandler.GetAllTimeFrame))
+	v1Api.POST("/time-frame/create-multi", ginext.WrapHandler(timeFrameHandler.Create))
+	v1Api.PUT("/time-frame/update", ginext.WrapHandler(timeFrameHandler.Update))
 
 	// parking lot
 	v1Api.POST("/parking-lot/create", ginext.WrapHandler(lotHandler.CreateParkingLot))

@@ -23,7 +23,7 @@ type AuthHandlerInterface interface {
 
 func (h *AuthHandler) Login(r *ginext.Request) (*ginext.Response, error) {
 	log := logger.WithCtx(r.GinCtx, utils.GetCurrentCaller(h, 0))
-	req := model.LoginParam{}
+	req := model.Credential{}
 	if err := r.GinCtx.BindJSON(&req); err != nil {
 		log.WithError(err).Error("Invalid input")
 		return nil, ginext.NewError(http.StatusBadRequest, "Invalid input: "+err.Error())

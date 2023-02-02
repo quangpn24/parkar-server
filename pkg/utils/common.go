@@ -6,6 +6,7 @@ import (
 	"github.com/astaxie/beego/validation"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"golang.org/x/crypto/bcrypt"
 	"parkar-server/pkg/model"
 	"reflect"
 	"regexp"
@@ -139,6 +140,10 @@ func CheckRequireValid(ob interface{}) error {
 		return fmt.Errorf(err)
 	}
 	return nil
+}
+func Hash(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+	return string(bytes), err
 }
 
 type Time struct {
