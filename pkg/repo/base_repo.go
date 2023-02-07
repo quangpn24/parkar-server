@@ -62,8 +62,6 @@ type PGInterface interface {
 
 	//token
 	CreateRefreshToken(ctx context.Context, refreshToken *model.RefreshToken, tx *gorm.DB) error
-	GetOneUserByID(ctx context.Context, id uuid.UUID) (model.User, error)
-	UpdateUser(ctx context.Context, req *model.User) error
 
 	// Parking lot
 	CreateParkingLot(ctx context.Context, req *model.ParkingLot) error

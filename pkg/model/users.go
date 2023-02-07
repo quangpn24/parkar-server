@@ -10,7 +10,6 @@ type User struct {
 	DisplayName string `json:"display_name"`
 	Email       string `json:"email"`
 	ImageUrl    string `json:"image_url"`
-	Email       string `json:"email"`
 	Password    string `json:"password" gorm:"not null"`
 	PhoneNumber string `json:"phone_number" gorm:"not null"`
 }

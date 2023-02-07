@@ -65,46 +65,19 @@ func (r *RepoPG) CreateUser(ctx context.Context, user *model.User, tx *gorm.DB) 
 	}
 	return nil
 }
-func (r *RepoPG) UpdateUser(ctx context.Context, user *model.User, tx *gorm.DB) error {
-	log := logger.WithCtx(ctx, utils.GetCurrentCaller(r, 0))
+func (r *RepoPG) UpdateUser(ctx context.Context, req *model.User, tx *gorm.DB) error {
 	var cancel context.CancelFunc
 	if tx == nil {
 		tx, cancel = r.DBWithTimeout(ctx)
 		defer cancel()
 	}
 
-	if err := tx.Model(&model.User{}).Where("id = ?", user.ID).Save(&user).Error; err != nil {
-		log.WithError(err).Error("error_500: error when UpdateUser")
-	"errors"
-	"github.com/google/uuid"
-	"gitlab.com/goxp/cloud0/ginext"
-	"gorm.io/gorm"
-	"net/http"
-	"parkar-server/pkg/model"
-)
-
-func (r *RepoPG) GetOneUserByID(ctx context.Context, id uuid.UUID) (res model.User, err error) {
-	tx, cancel := r.DBWithTimeout(ctx)
-	defer cancel()
-
-	if err = tx.Model(&model.User{}).Where("id = ?", id).Take(&res).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return res, ginext.NewError(http.StatusNotFound, err.Error())
-		}
-		return res, ginext.NewError(http.StatusInternalServerError, err.Error())
-	}
-	return res, nil
-}
-
-func (r *RepoPG) UpdateUser(ctx context.Context, req *model.User) error {
-	tx, cancel := r.DBWithTimeout(ctx)
-	defer cancel()
-
 	if err := tx.Model(&model.User{}).Where("id = ?", req.ID).Save(&req).Error; err != nil {
 		return ginext.NewError(http.StatusInternalServerError, err.Error())
 	}
 	return nil
 }
+
 func (r *RepoPG) DeleteUser(ctx context.Context, id string, tx *gorm.DB) error {
 	log := logger.WithCtx(ctx, utils.GetCurrentCaller(r, 0))
 	var cancel context.CancelFunc
