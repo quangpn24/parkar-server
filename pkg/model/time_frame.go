@@ -18,13 +18,13 @@ func (timeFrame *TimeFrame) TableName() string {
 type TimeFrameReq struct {
 	Duration     int       `json:"duration" valid:"Required"`
 	Cost         float64   `json:"cost" valid:"Required"`
-	ParkingLotId uuid.UUID `json:"parking_lot_id" valid:"Required"`
+	ParkingLotId uuid.UUID `json:"parkingLotId" valid:"Required"`
 }
 type ListTimeFrameReq struct {
 	Data []TimeFrameReq `json:"data"`
 }
 type GetListTimeFrameParam struct {
-	ParkingLotId *uuid.UUID `json:"parking_lot_id" valid:"Required"`
+	ParkingLotId *string `json:"parkingLotId" form:"parkingLotId" valid:"Required"`
 }
 type ListTimeFrame struct {
 	Data []TimeFrame `json:"data"`

@@ -56,10 +56,6 @@ func (r *RepoPG) GetListParkingLot(ctx context.Context, req model.ListParkingLot
 		tx = tx.Where("unaccent(name) ilike ?", name+"%")
 	}
 
-	if req.IsActive != nil {
-		tx = tx.Where("is_active = ?", valid.Bool(req.IsActive))
-	}
-
 	if req.Sort != "" {
 		tx = tx.Order(req.Sort)
 	} else {

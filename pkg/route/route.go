@@ -71,17 +71,20 @@ func NewService() *Service {
 
 	//auth
 	v1Api.POST("/user/login", ginext.WrapHandler(authHandler.Login))
+	v1Api.POST("/user/reset-password", ginext.WrapHandler(authHandler.ResetPassword))
+	//v1Api.POST("/user/create", ginext.WrapHandler(userHandler.))
 
 	//user
 	v1Api.GET("/user/:id", ginext.WrapHandler(userHandler.GetOneUserById))
+	v1Api.POST("/user/create", ginext.WrapHandler(userHandler.CreateUser))
 	v1Api.POST("/user/check-phone", ginext.WrapHandler(userHandler.CheckDuplicatePhone))
 	v1Api.PUT("/user/:id", ginext.WrapHandler(userHandler.UpdateUser))
 	v1Api.DELETE("/user/:id", ginext.WrapHandler(userHandler.DeleteUser))
 
 	//favorite
-	v1Api.POST("/favorite", ginext.WrapHandler(favoriteHandler.Create))
+	v1Api.POST("/favorite/create", ginext.WrapHandler(favoriteHandler.Create))
 	v1Api.GET("/favorite/user/:idUser", ginext.WrapHandler(favoriteHandler.GetAllFavoriteParkingByUser))
-	v1Api.DELETE("/favorite", ginext.WrapHandler(favoriteHandler.DeleteOne))
+	v1Api.DELETE("/favorite/delete/:id", ginext.WrapHandler(favoriteHandler.DeleteOne))
 
 	//time frame
 	v1Api.GET("/time-frame/get-all", ginext.WrapHandler(timeFrameHandler.GetAllTimeFrame))
@@ -102,12 +105,13 @@ func NewService() *Service {
 	v1Api.PUT("/block/update/:id", ginext.WrapHandler(blockHandler.UpdateBlock))
 	v1Api.DELETE("/block/delete/:id", ginext.WrapHandler(blockHandler.DeleteBlock))
 
-	// parking lot
+	// parking slot
 	v1Api.POST("/parking-slot/create", ginext.WrapHandler(slotHandler.CreateParkingSlot))
 	v1Api.GET("/parking-slot/get-one/:id", ginext.WrapHandler(slotHandler.GetOneParkingSlot))
 	v1Api.GET("/parking-slot/get-list", ginext.WrapHandler(slotHandler.GetListParkingSlot))
 	v1Api.PUT("/parking-slot/update/:id", ginext.WrapHandler(slotHandler.UpdateParkingSlot))
 	v1Api.DELETE("/parking-slot/delete/:id", ginext.WrapHandler(slotHandler.DeleteParkingSlot))
+	//v1Api.GET("/parking-slot/availability", ginext.WrapHandler(slotHandler.DeleteParkingSlot))
 
 	// parking lot
 	v1Api.POST("/vehicle/create", ginext.WrapHandler(vehicleHandler.CreateVehicle))

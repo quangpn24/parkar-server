@@ -14,7 +14,7 @@ type Vehicle struct {
 }
 
 func (Vehicle) TableName() string {
-	return "parking_slot"
+	return "vehicle"
 }
 
 type VehicleReq struct {

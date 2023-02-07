@@ -43,7 +43,7 @@ func (r *RepoPG) GetOneUserByPhone(ctx context.Context, phoneNumber string, tx *
 	if err := tx.Model(&model.User{}).Where("phone_number = ?", phoneNumber).Take(&rs).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			log.WithError(err).Error("Not found user by phone number: " + phoneNumber)
-			return nil, ginext.NewError(http.StatusInternalServerError, "Not found user by phone number: "+phoneNumber)
+			return nil, err
 		} else {
 			log.WithError(err).Error("Error when get one user by phone number")
 			return nil, ginext.NewError(http.StatusInternalServerError, "Error when get one user by phone number")

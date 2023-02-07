@@ -2,6 +2,7 @@ package repo
 
 import (
 	"context"
+	"github.com/google/uuid"
 	"gitlab.com/goxp/cloud0/ginext"
 	"gitlab.com/goxp/cloud0/logger"
 	"gorm.io/gorm"
@@ -37,14 +38,14 @@ func (r *RepoPG) GetAllFavoriteParkingByUser(ctx context.Context, userId string,
 	}
 	return res, nil
 }
-func (r *RepoPG) DeleteOneFavorite(ctx context.Context, req model.FavoriteRequest, tx *gorm.DB) error {
+func (r *RepoPG) DeleteOneFavorite(ctx context.Context, id uuid.UUID, tx *gorm.DB) error {
 	log := logger.WithCtx(ctx, utils.GetCurrentCaller(r, 0))
 	var cancel context.CancelFunc
 	if tx == nil {
 		tx, cancel = r.DBWithTimeout(ctx)
 		defer cancel()
 	}
-	if err := tx.Where("user_id = ? and parking_lot_id = ? ", req.UserId, req.ParkingLotId).Delete(&model.Favorite{}).Error; err != nil {
+	if err := tx.Where("id = ?", id).Delete(&model.Favorite{}).Error; err != nil {
 		log.WithError(err).Error("Error when delete favorite parking - DeleteOneFavorite - RepoPG")
 		return ginext.NewError(http.StatusInternalServerError, "Error when delete favorite parking: "+err.Error())
 	}

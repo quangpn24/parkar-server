@@ -4,8 +4,8 @@ import "github.com/google/uuid"
 
 type Favorite struct {
 	BaseModel
-	UserId       uuid.UUID `json:"user_id"`
-	ParkingLotId uuid.UUID `json:"parking_lot_id"`
+	UserId       uuid.UUID `json:"userId"`
+	ParkingLotId uuid.UUID `json:"parkingLotId"`
 	//ParkingLot ParkingLot
 }
 
@@ -14,6 +14,6 @@ func (f *Favorite) TableName() string {
 }
 
 type FavoriteRequest struct {
-	UserId       uuid.UUID `json:"user_id" valid:"Required"`
-	ParkingLotId uuid.UUID `json:"parking_lot_id" valid:"Required"`
+	UserId       uuid.UUID `json:"userId" valid:"Required"`
+	ParkingLotId uuid.UUID `json:"parkingLotId" valid:"Required"`
 }

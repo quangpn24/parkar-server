@@ -24,6 +24,7 @@ type UserHandlerInterface interface {
 	CheckDuplicatePhone(r *ginext.Request) (*ginext.Response, error)
 	UpdateUser(r *ginext.Request) (*ginext.Response, error)
 	DeleteUser(r *ginext.Request) (*ginext.Response, error)
+	CreateUser(r *ginext.Request) (*ginext.Response, error)
 }
 
 func (h *UserHandler) GetOneUserById(r *ginext.Request) (*ginext.Response, error) {
@@ -51,10 +52,7 @@ func (h *UserHandler) CheckDuplicatePhone(r *ginext.Request) (*ginext.Response, 
 		log.WithError(err).Error("Invalid data!")
 		return nil, ginext.NewError(http.StatusBadRequest, "Invalid data: "+err.Error())
 	}
-	res, err := h.service.CheckDuplicatePhone(r.GinCtx, req.PhoneNumber)
-	if err != nil {
-		return nil, err
-	}
+	res, _ := h.service.CheckDuplicatePhone(r.GinCtx, req.PhoneNumber)
 	return ginext.NewResponseData(http.StatusOK, res), nil
 }
 func (h *UserHandler) UpdateUser(r *ginext.Request) (*ginext.Response, error) {
@@ -95,4 +93,24 @@ func (h *UserHandler) DeleteUser(r *ginext.Request) (*ginext.Response, error) {
 		return nil, err
 	}
 	return ginext.NewResponse(http.StatusOK), nil
+}
+func (h *UserHandler) CreateUser(r *ginext.Request) (*ginext.Response, error) {
+	log := logger.WithCtx(r.GinCtx, utils.GetCurrentCaller(h, 0))
+	req := model.CreateUserReq{}
+	if err := r.GinCtx.BindJSON(&req); err != nil {
+		log.WithError(err).Error("Invalid input")
+		return nil, ginext.NewError(http.StatusBadRequest, "Invalid input: "+err.Error())
+	}
+	//check valid req
+	if err := utils.CheckRequireValid(req); err != nil {
+		log.WithError(err).Error("Cần nhập đầy đủ thông tin")
+		return nil, ginext.NewError(http.StatusBadRequest, err.Error())
+	}
+
+	rs, err := h.service.CreateUser(r.GinCtx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return ginext.NewResponseData(http.StatusCreated, rs), nil
 }

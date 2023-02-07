@@ -8,6 +8,7 @@ type User struct {
 	BaseModel
 	SocialID    string `json:"social_id"`
 	DisplayName string `json:"display_name"`
+	Email       string `json:"email"`
 	ImageUrl    string `json:"image_url"`
 	Password    string `json:"password" gorm:"not null"`
 	PhoneNumber string `json:"phone_number" gorm:"not null"`
@@ -37,4 +38,11 @@ type UserReq struct {
 	ImageUrl    *string    `json:"image_url"`
 	Password    *string    `json:"password"`
 	PhoneNumber *string    `json:"phone_number"`
+	Email       *string    `json:"email"`
+}
+type CreateUserReq struct {
+	DisplayName *string `json:"display_name"`
+	Password    *string `json:"password" valid:"Required"`
+	PhoneNumber *string `json:"phone_number" valid:"Required"`
+	Email       *string `json:"email"`
 }

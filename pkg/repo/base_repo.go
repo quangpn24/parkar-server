@@ -49,7 +49,7 @@ type PGInterface interface {
 	//favorite
 	GetAllFavoriteParkingByUser(ctx context.Context, userId string, tx *gorm.DB) (res []model.Favorite, err error)
 	CreateFavorite(ctx context.Context, favorite *model.Favorite, tx *gorm.DB) error
-	DeleteOneFavorite(ctx context.Context, req model.FavoriteRequest, tx *gorm.DB) error
+	DeleteOneFavorite(ctx context.Context, id uuid.UUID, tx *gorm.DB) error
 
 	//time frame
 	GetAllTimeFrame(ctx context.Context, req model.GetListTimeFrameParam, tx *gorm.DB) (res *model.ListTimeFrame, err error)
