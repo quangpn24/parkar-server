@@ -26,7 +26,7 @@ type VehicleReq struct {
 }
 
 type ListVehicleReq struct {
-	UserID   *uuid.UUID `json:"user_id" form:"block_id"`
+	UserID   *uuid.UUID `json:"user_id" form:"user_id"`
 	Type     *string    `json:"type" form:"type"`
 	Sort     string     `json:"sort" form:"sort"`
 	Page     int        `json:"page" form:"page"`

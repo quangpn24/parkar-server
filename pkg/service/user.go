@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"github.com/google/uuid"
 	"parkar-server/pkg/model"
 	"parkar-server/pkg/repo"
 	"parkar-server/pkg/utils"

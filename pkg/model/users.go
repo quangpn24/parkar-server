@@ -9,6 +9,7 @@ type User struct {
 	SocialID    string `json:"social_id"`
 	DisplayName string `json:"display_name"`
 	ImageUrl    string `json:"image_url"`
+	Email       string `json:"email"`
 	Password    string `json:"password" gorm:"not null"`
 	PhoneNumber string `json:"phone_number" gorm:"not null"`
 }
@@ -37,4 +38,12 @@ type UserReq struct {
 	ImageUrl    *string    `json:"image_url"`
 	Password    *string    `json:"password"`
 	PhoneNumber *string    `json:"phone_number"`
+}
+
+type UserReq struct {
+	ID          *uuid.UUID `json:"id,omitempty"`
+	DisplayName string     `json:"display_name"`
+	ImageUrl    string     `json:"image_url"`
+	Email       string     `json:"email"`
+	Password    string     `json:"password" gorm:"not null"`
 }
