@@ -69,7 +69,7 @@ func NewService() *Service {
 	// swagger
 	swaggerApi.GET("/swagger/*any", swagger.WrapHandler(swaggerFiles.Handler))
 
-	//auth
+	// auth
 	v1Api.POST("/user/login", ginext.WrapHandler(authHandler.Login))
 	v1Api.POST("/user/reset-password", ginext.WrapHandler(authHandler.ResetPassword))
 	//v1Api.POST("/user/create", ginext.WrapHandler(userHandler.))
@@ -90,6 +90,8 @@ func NewService() *Service {
 	v1Api.GET("/time-frame/get-all", ginext.WrapHandler(timeFrameHandler.GetAllTimeFrame))
 	v1Api.POST("/time-frame/create-multi", ginext.WrapHandler(timeFrameHandler.Create))
 	v1Api.PUT("/time-frame/update", ginext.WrapHandler(timeFrameHandler.Update))
+	// user
+	v1Api.PUT("/user/update/:id", ginext.WrapHandler(userHandler.UpdateUser))
 
 	// parking lot
 	v1Api.POST("/parking-lot/create", ginext.WrapHandler(lotHandler.CreateParkingLot))
