@@ -8,7 +8,7 @@ type TimeFrame struct {
 	BaseModel
 	Duration     int       `json:"duration"`
 	Cost         float64   `json:"cost"`
-	ParkingLotId uuid.UUID `json:"parking_lot_id" gorm:"not null"`
+	ParkingLotId uuid.UUID `json:"parkingLotId" gorm:"type:uuid;not null"`
 }
 
 func (timeFrame *TimeFrame) TableName() string {

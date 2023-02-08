@@ -60,6 +60,9 @@ type PGInterface interface {
 	CancelTicket(ctx context.Context, req model.CancelTicketRequest, tx *gorm.DB) error
 	GetAllTicket(ctx context.Context, req model.GetListTicketParam, tx *gorm.DB) ([]model.Ticket, error)
 
+	//long term ticket
+	CreateLongTermTicket(ctx context.Context, ltTicket *model.LongTermTicket, tx *gorm.DB) error
+
 	//token
 	CreateRefreshToken(ctx context.Context, refreshToken *model.RefreshToken, tx *gorm.DB) error
 
@@ -81,6 +84,7 @@ type PGInterface interface {
 	CreateParkingSlot(ctx context.Context, req *model.ParkingSlot) error
 	GetOneParkingSlot(ctx context.Context, id uuid.UUID) (model.ParkingSlot, error)
 	GetListParkingSlot(ctx context.Context, req model.ListParkingSlotReq) (model.ListParkingSlotRes, error)
+	GetAvailableParkingSlot(ctx context.Context, req model.AvailableParkingSlotReq) (model.ListParkingSlotRes, error)
 	UpdateParkingSlot(ctx context.Context, req *model.ParkingSlot) error
 	DeleteParkingSlot(ctx context.Context, id uuid.UUID) error
 

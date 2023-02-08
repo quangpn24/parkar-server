@@ -7,7 +7,6 @@ import (
 	"parkar-server/pkg/model"
 	"parkar-server/pkg/service"
 	"parkar-server/pkg/utils"
-	"parkar-server/pkg/valid"
 )
 
 type TicketHandler struct {
@@ -26,14 +25,18 @@ type TicketHandlerInterface interface {
 
 func (h *TicketHandler) CreateTicket(r *ginext.Request) (*ginext.Response, error) {
 	log := logger.WithCtx(r.GinCtx, utils.GetCurrentCaller(h, 0))
-	req := &model.Ticket{}
+	// check x-user-id
+	_, err := utils.CurrentUser(r.GinCtx.Request)
+	if err != nil {
+		log.WithError(err).Error("error_401: Error when get current user")
+		return nil, ginext.NewError(http.StatusBadRequest, utils.MessageError()[http.StatusUnauthorized])
+	}
+	req := model.TicketReq{}
 	if err := r.GinCtx.BindJSON(&req); err != nil {
 		log.WithError(err).Error("Error when parse req!")
 		return nil, ginext.NewError(http.StatusBadRequest, "Error when parse req: "+err.Error())
 	}
-	req.CreatorID = valid.UUIDPointer(req.UserId)
-	req.UpdaterID = valid.UUIDPointer(req.UserId)
-	res, err := h.service.CreateTicket(r.Context(), req)
+	res, err := h.service.CreateTicket(r.Context(), &req)
 	if err != nil {
 		return nil, err
 	}

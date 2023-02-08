@@ -47,9 +47,25 @@ func (r *RepoPG) GetAllTicket(ctx context.Context, req model.GetListTicketParam,
 	if req.State != nil {
 		tx = tx.Where("state = ?", req.State)
 	}
-	if err := tx.Where("user_id = ?", req.UserId).Find(&res).Error; err != nil {
+	if err := tx.Where("user_id = ?", req.UserId).Preload("Vehicle").Preload("ParkingLot").
+		Preload("ParkingSlot").Preload("ParkingSlot.Block").Preload("TimeFrame").
+		Find(&res).Error; err != nil {
 		log.WithError(err).Error("Error when get all ticket - GetAllTicket - RepoPG")
 		return nil, ginext.NewError(http.StatusInternalServerError, "Error when get all ticket: "+err.Error())
 	}
 	return res, nil
+}
+
+func (r *RepoPG) CreateLongTermTicket(ctx context.Context, ltTicket *model.LongTermTicket, tx *gorm.DB) error {
+	log := logger.WithCtx(ctx, utils.GetCurrentCaller(r, 0))
+	var cancel context.CancelFunc
+	if tx == nil {
+		tx, cancel = r.DBWithTimeout(ctx)
+		defer cancel()
+	}
+	if err := tx.Model(&model.LongTermTicket{}).Create(&ltTicket).Error; err != nil {
+		log.WithError(err).Error("Error when create long term ticket - CreateLongTermTicket - RepoPG")
+		return ginext.NewError(http.StatusInternalServerError, "Error when create long term ticket: "+err.Error())
+	}
+	return nil
 }

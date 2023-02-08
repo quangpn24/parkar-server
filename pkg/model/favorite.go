@@ -4,8 +4,8 @@ import "github.com/google/uuid"
 
 type Favorite struct {
 	BaseModel
-	UserId       uuid.UUID `json:"userId"`
-	ParkingLotId uuid.UUID `json:"parkingLotId"`
+	UserId       uuid.UUID `json:"userId" gorm:"type:uuid"`
+	ParkingLotId uuid.UUID `json:"parkingLotId" gorm:"type:uuid"`
 	//ParkingLot ParkingLot
 }
 

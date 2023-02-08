@@ -15,7 +15,7 @@ type ParkingLot struct {
 	EndTime     time.Time `json:"endTime"`
 	Lat         string    `json:"lat"`
 	Long        string    `json:"long"`
-	CompanyID   uuid.UUID `json:"companyID"`
+	CompanyID   uuid.UUID `json:"companyID" gorm:"type:uuid"`
 }
 
 func (ParkingLot) TableName() string {
