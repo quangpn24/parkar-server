@@ -44,7 +44,7 @@ func (r *RepoPG) GetOneCompany(ctx context.Context, id uuid.UUID) (res model.Com
 	tx, cancel := r.DBWithTimeout(ctx)
 	defer cancel()
 
-	if err = tx.Model(&model.Block{}).Where("id = ?", id).Take(&res).Error; err != nil {
+	if err = tx.Model(&model.Company{}).Where("id = ?", id).Take(&res).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			log.WithError(err).Error("error_404: not found")
 			return res, ginext.NewError(http.StatusNotFound, err.Error())
@@ -53,4 +53,14 @@ func (r *RepoPG) GetOneCompany(ctx context.Context, id uuid.UUID) (res model.Com
 		return res, ginext.NewError(http.StatusInternalServerError, err.Error())
 	}
 	return res, nil
+}
+
+func (r *RepoPG) UpdateCompany(ctx context.Context, req *model.Company) error {
+	tx, cancel := r.DBWithTimeout(ctx)
+	defer cancel()
+
+	if err := tx.Model(&model.Company{}).Where("id = ?", req.ID).Updates(&req).Error; err != nil {
+		return ginext.NewError(http.StatusInternalServerError, "Error when UpdateCompany: "+err.Error())
+	}
+	return nil
 }

@@ -32,11 +32,11 @@ func (h *ParkingLotHandler) CreateParkingLot(r *ginext.Request) (*ginext.Respons
 	log := logger.WithCtx(r.Context(), utils.GetCurrentCaller(h, 0))
 
 	// check x-user-id
-	_, err := utils.CurrentUser(r.GinCtx.Request)
-	if err != nil {
-		log.WithError(err).Error("error_401: Error when get current user")
-		return nil, ginext.NewError(http.StatusBadRequest, utils.MessageError()[http.StatusUnauthorized])
-	}
+	//_, err := utils.CurrentUser(r.GinCtx.Request)
+	//if err != nil {
+	//	log.WithError(err).Error("error_401: Error when get current user")
+	//	return nil, ginext.NewError(http.StatusBadRequest, utils.MessageError()[http.StatusUnauthorized])
+	//}
 
 	// parse & check valid request
 	var req model.ParkingLotReq
@@ -150,11 +150,11 @@ func (h *ParkingLotHandler) UpdateParkingLot(r *ginext.Request) (*ginext.Respons
 	log := logger.WithCtx(r.Context(), utils.GetCurrentCaller(h, 0))
 
 	// check x-user-id
-	_, err := utils.CurrentUser(r.GinCtx.Request)
-	if err != nil {
-		log.WithError(err).Error("error_401: Error when get current user")
-		return nil, ginext.NewError(http.StatusBadRequest, utils.MessageError()[http.StatusUnauthorized])
-	}
+	//_, err := utils.CurrentUser(r.GinCtx.Request)
+	//if err != nil {
+	//	log.WithError(err).Error("error_401: Error when get current user")
+	//	return nil, ginext.NewError(http.StatusBadRequest, utils.MessageError()[http.StatusUnauthorized])
+	//}
 
 	// parse & check valid request
 	var req model.ParkingLotReq

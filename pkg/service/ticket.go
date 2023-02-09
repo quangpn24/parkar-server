@@ -21,6 +21,11 @@ type TicketServiceInterface interface {
 	GetAllTicket(ctx context.Context, req model.GetListTicketParam) ([]model.Ticket, error)
 	GetOneTicketWithExtend(ctx context.Context, id string) (model.TicketResponse, error)
 	CancelTicket(ctx context.Context, id string) error
+	GetAllTicketCompany(ctx context.Context, req model.GetListTicketReq) ([]model.GetListTicketRes, error)
+}
+
+func (s *TicketService) GetAllTicketCompany(ctx context.Context, req model.GetListTicketReq) ([]model.GetListTicketRes, error) {
+	return s.repo.GetAllTicketCompany(ctx, req)
 }
 
 func (s *TicketService) CreateTicket(ctx context.Context, req *model.TicketReq) (*model.Ticket, error) {

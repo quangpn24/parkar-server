@@ -62,6 +62,7 @@ type PGInterface interface {
 	GetOneTicketWithExtend(ctx context.Context, id string, tx *gorm.DB) (model.Ticket, error)
 	GetListExtendTicketByOrigin(ctx context.Context, idParent string, tx *gorm.DB) ([]model.Ticket, error)
 	UpdateTicket(ctx context.Context, ticket *model.Ticket, tx *gorm.DB) error
+	GetAllTicketCompany(ctx context.Context, req model.GetListTicketReq) (res []model.GetListTicketRes, err error)
 
 	//ticket extend
 	CreateTicketExtend(ctx context.Context, req *model.TicketExtend, tx *gorm.DB) error
@@ -105,6 +106,7 @@ type PGInterface interface {
 	CreateCompany(ctx context.Context, req *model.Company) error
 	GetCompanyByEmail(ctx context.Context, email string) (model.Company, error)
 	GetOneCompany(ctx context.Context, id uuid.UUID) (model.Company, error)
+	UpdateCompany(ctx context.Context, req *model.Company) error
 }
 
 type RepoPG struct {

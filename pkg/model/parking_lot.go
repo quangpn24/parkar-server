@@ -13,8 +13,8 @@ type ParkingLot struct {
 	Address     string    `json:"address"`
 	StartTime   time.Time `json:"startTime"`
 	EndTime     time.Time `json:"endTime"`
-	Lat         string    `json:"lat"`
-	Long        string    `json:"long"`
+	Lat         float64   `json:"lat"`
+	Long        float64   `json:"long"`
 	CompanyID   uuid.UUID `json:"companyID" gorm:"type:uuid"`
 }
 
@@ -29,18 +29,18 @@ type ParkingLotReq struct {
 	Address     *string    `json:"address"`
 	StartTime   *time.Time `json:"startTime"`
 	EndTime     *time.Time `json:"endTime"`
-	Lat         *string    `json:"lat"`
-	Long        *string    `json:"long"`
+	Lat         *float64   `json:"lat"`
+	Long        *float64   `json:"long"`
 	CompanyID   *uuid.UUID `json:"companyID"`
 }
 
 type ListParkingLotReq struct {
-	Name     *string `json:"name" form:"name"`
-	Lat      *string `json:"lat" form:"lat"`
-	Long     *string `json:"long" form:"long"`
-	Sort     string  `json:"sort" form:"sort"`
-	Page     int     `json:"page" form:"page"`
-	PageSize int     `json:"pageSize" form:"pageSize"`
+	Name     *string  `json:"name" form:"name"`
+	Lat      *float64 `json:"lat" form:"lat"`
+	Long     *float64 `json:"long" form:"long"`
+	Sort     string   `json:"sort" form:"sort"`
+	Page     int      `json:"page" form:"page"`
+	PageSize int      `json:"pageSize" form:"pageSize"`
 }
 
 type ListParkingLotRes struct {
@@ -49,11 +49,11 @@ type ListParkingLotRes struct {
 }
 
 type GetListParkingLotReq struct {
-	CompanyID *string `json:"company_id" form:"company_id"`
-	Name      *string `json:"name" form:"name"`
-	Lat       *string `json:"lat" form:"lat"`
-	Long      *string `json:"long" form:"long"`
-	Sort      string  `json:"sort" form:"sort"`
-	Page      int     `json:"page" form:"page"`
-	PageSize  int     `json:"pageSize" form:"pageSize"`
+	CompanyID *string  `json:"company_id" form:"company_id"`
+	Name      *string  `json:"name" form:"name"`
+	Lat       *float64 `json:"lat" form:"lat"`
+	Long      *float64 `json:"long" form:"long"`
+	Sort      string   `json:"sort" form:"sort"`
+	Page      int      `json:"page" form:"page"`
+	PageSize  int      `json:"pageSize" form:"pageSize"`
 }

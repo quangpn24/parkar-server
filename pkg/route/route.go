@@ -85,21 +85,6 @@ func NewService() *Service {
 	}(),
 	)
 
-	route := s.Router
-	route.Use(func() gin.HandlerFunc {
-		return func(c *gin.Context) {
-			c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
-			c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
-			c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
-			c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT")
-			if c.Request.Method == "OPTIONS" {
-				c.AbortWithStatus(204)
-				return
-			}
-			c.Next()
-		}
-	}(),
-	)
 	v1Api := s.Router.Group("/api/v1")
 	merchantApi := s.Router.Group("/api/merchant")
 	swaggerApi := s.Router.Group("/")
@@ -168,8 +153,10 @@ func NewService() *Service {
 
 	// company
 	merchantApi.POST("/company/create", cors.Default(), ginext.WrapHandler(companyHanler.CreateCompany))
+	merchantApi.PUT("/company/update/:id", cors.Default(), ginext.WrapHandler(companyHanler.UpdateCompany))
 	merchantApi.POST("/company/login", cors.Default(), ginext.WrapHandler(companyHanler.Login))
 	merchantApi.GET("/company/get-one/:id", cors.Default(), ginext.WrapHandler(companyHanler.GetOneCompany))
+	merchantApi.PUT("/company/update-password/:id", cors.Default(), ginext.WrapHandler(companyHanler.UpdateCompanyPassword))
 
 	merchantApi.GET("/parking-lot/get-list", ginext.WrapHandler(lotHandler.GetListParkingLotCompany))
 	merchantApi.GET("/parking-lot/get-one/:id", ginext.WrapHandler(lotHandler.GetOneParkingLot))
@@ -177,6 +164,7 @@ func NewService() *Service {
 	merchantApi.GET("/block/get-list", ginext.WrapHandler(blockHandler.GetListBlock))
 
 	merchantApi.GET("/time-frame/get-list", ginext.WrapHandler(timeFrameHandler.GetAllTimeFrame))
+	merchantApi.GET("/ticket/get-all", ginext.WrapHandler(ticketHandler.GetAllTicketCompany))
 
 	// Migrate
 	migrateHandler := handlers.NewMigrationHandler(db)
