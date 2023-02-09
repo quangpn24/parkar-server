@@ -88,7 +88,7 @@ func (r *RepoPG) GetAvailableParkingSlot(ctx context.Context, req model.Availabl
 
 	query := utils.RemoveSpace(`WITH slot_avail as (
 										select
-											ps.*
+											distinct ps.*
 										from
 											parking_slot ps
 										left join ticket t on

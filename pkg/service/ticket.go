@@ -20,6 +20,7 @@ type TicketServiceInterface interface {
 	ExtendTicket(ctx context.Context, req *model.ExtendTicketReq) (*model.TicketExtend, error)
 	GetAllTicket(ctx context.Context, req model.GetListTicketParam) ([]model.Ticket, error)
 	GetOneTicketWithExtend(ctx context.Context, id string) (model.TicketResponse, error)
+	CancelTicket(ctx context.Context, id string) error
 }
 
 func (s *TicketService) CreateTicket(ctx context.Context, req *model.TicketReq) (*model.Ticket, error) {
@@ -125,4 +126,15 @@ func (s *TicketService) GetOneTicketWithExtend(ctx context.Context, id string) (
 		TicketExtend: ticketExtend,
 	}
 	return ticketRes, nil
+}
+func (s *TicketService) CancelTicket(ctx context.Context, id string) error {
+	ticket, err := s.repo.GetOneTicket(ctx, id, nil)
+	if err != nil {
+		return err
+	}
+	ticket.State = "cancel"
+	if err := s.repo.UpdateTicket(ctx, &ticket, nil); err != nil {
+		return err
+	}
+	return nil
 }

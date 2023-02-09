@@ -59,6 +59,8 @@ func (s *AuthService) Login(ctx context.Context, req model.Credential) (interfac
 		PhoneNumber:  user.PhoneNumber,
 		DisplayName:  user.DisplayName,
 		Id:           user.ID,
+		Email:        user.Email,
+		ImageUrl:     user.ImageUrl,
 	}
 	return res, nil
 }

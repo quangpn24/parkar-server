@@ -31,7 +31,7 @@ func (t *Ticket) TableName() string {
 }
 
 type CancelTicketRequest struct {
-	ListTicketId []string `json:"list_ticket_id"`
+	TicketId string `json:"ticketId"`
 }
 type GetListTicketParam struct {
 	UserId *string `json:"userId" form:"userId" valid:"Required"`

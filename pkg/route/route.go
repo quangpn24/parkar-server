@@ -96,7 +96,7 @@ func NewService() *Service {
 	v1Api.GET("/user/:id", ginext.WrapHandler(userHandler.GetOneUserById))
 	v1Api.POST("/user/create", ginext.WrapHandler(userHandler.CreateUser))
 	v1Api.POST("/user/check-phone", ginext.WrapHandler(userHandler.CheckDuplicatePhone))
-	v1Api.PUT("/user/:id", ginext.WrapHandler(userHandler.UpdateUser))
+	v1Api.PUT("/user/update/:id", ginext.WrapHandler(userHandler.UpdateUser))
 	v1Api.DELETE("/user/:id", ginext.WrapHandler(userHandler.DeleteUser))
 
 	//favorite
@@ -108,8 +108,6 @@ func NewService() *Service {
 	v1Api.GET("/time-frame/get-all", ginext.WrapHandler(timeFrameHandler.GetAllTimeFrame))
 	v1Api.POST("/time-frame/create-multi", ginext.WrapHandler(timeFrameHandler.Create))
 	v1Api.PUT("/time-frame/update", ginext.WrapHandler(timeFrameHandler.Update))
-	// user
-	v1Api.PUT("/user/update/:id", ginext.WrapHandler(userHandler.UpdateUser))
 
 	// parking lot
 	v1Api.POST("/parking-lot/create", ginext.WrapHandler(lotHandler.CreateParkingLot))
@@ -145,12 +143,11 @@ func NewService() *Service {
 	v1Api.POST("/ticket/create", ginext.WrapHandler(ticketHandler.CreateTicket))
 	v1Api.GET("/ticket/get-all", ginext.WrapHandler(ticketHandler.GetAllTicket))
 	v1Api.GET("/ticket/get-one-with-extend/:id", ginext.WrapHandler(ticketHandler.GetOneTicketWithExtend))
-	v1Api.POST("/ticket/cancel", ginext.WrapHandler(ticketHandler.CancelTicket))
+	v1Api.PUT("/ticket/cancel", ginext.WrapHandler(ticketHandler.CancelTicket))
 	v1Api.POST("/ticket/extend", ginext.WrapHandler(ticketHandler.ExtendTicket))
 
 	// Migrate
 	migrateHandler := handlers.NewMigrationHandler(db)
 	s.Router.POST("/internal/migrate", migrateHandler.Migrate)
-	s.Router.Run("127.0.0.1:8088")
 	return s
 }
