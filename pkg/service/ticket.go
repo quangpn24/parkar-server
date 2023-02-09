@@ -17,8 +17,9 @@ func NewTicketService(repo repo.PGInterface) TicketServiceInterface {
 
 type TicketServiceInterface interface {
 	CreateTicket(ctx context.Context, req *model.TicketReq) (*model.Ticket, error)
+	ExtendTicket(ctx context.Context, req *model.ExtendTicketReq) (*model.TicketExtend, error)
 	GetAllTicket(ctx context.Context, req model.GetListTicketParam) ([]model.Ticket, error)
-	CancelTicket(ctx context.Context, req model.CancelTicketRequest) error
+	GetOneTicketWithExtend(ctx context.Context, id string) (model.TicketResponse, error)
 }
 
 func (s *TicketService) CreateTicket(ctx context.Context, req *model.TicketReq) (*model.Ticket, error) {
@@ -66,6 +67,43 @@ func (s *TicketService) CreateTicket(ctx context.Context, req *model.TicketReq) 
 	}
 	return ticket, nil
 }
+func (s *TicketService) ExtendTicket(ctx context.Context, req *model.ExtendTicketReq) (*model.TicketExtend, error) {
+	ticket, err := s.repo.GetOneTicket(ctx, valid.UUID(req.TicketOriginId).String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	extendTicket := &model.Ticket{
+		BaseModel: model.BaseModel{
+			CreatorID: ticket.CreatorID,
+			UpdaterID: ticket.UpdaterID,
+		},
+		UserId:        ticket.UserId,
+		StartTime:     req.StartTime,
+		EndTime:       req.EndTime,
+		VehicleId:     ticket.VehicleId,
+		ParkingLotId:  ticket.ParkingLotId,
+		ParkingSlotId: ticket.ParkingSlotId,
+		TimeFrameId:   req.TimeFrameId,
+		State:         "extend",
+		Total:         valid.Float64(req.Total),
+	}
+	ticket.IsExtend = true
+	if err := s.repo.UpdateTicket(ctx, &ticket, nil); err != nil {
+		return nil, err
+	}
+	if err := s.repo.CreateTicket(ctx, extendTicket, nil); err != nil {
+		return nil, err
+	}
+	//create extend ticket table
+	ticketEx := &model.TicketExtend{
+		TicketExtendId: extendTicket.ID,
+		TicketId:       ticket.ID,
+	}
+	if err := s.repo.CreateTicketExtend(ctx, ticketEx, nil); err != nil {
+		return nil, err
+	}
+	return ticketEx, nil
+}
 func (s *TicketService) GetAllTicket(ctx context.Context, req model.GetListTicketParam) ([]model.Ticket, error) {
 	res, err := s.repo.GetAllTicket(ctx, req, nil)
 	if err != nil {
@@ -73,6 +111,18 @@ func (s *TicketService) GetAllTicket(ctx context.Context, req model.GetListTicke
 	}
 	return res, nil
 }
-func (s *TicketService) CancelTicket(ctx context.Context, req model.CancelTicketRequest) error {
-	return s.repo.CancelTicket(ctx, req, nil)
+func (s *TicketService) GetOneTicketWithExtend(ctx context.Context, id string) (model.TicketResponse, error) {
+	ticket, err := s.repo.GetOneTicketWithExtend(ctx, id, nil)
+	if err != nil {
+		return model.TicketResponse{}, err
+	}
+	ticketExtend, err := s.repo.GetListExtendTicketByOrigin(ctx, ticket.ID.String(), nil)
+	if err != nil {
+		return model.TicketResponse{}, err
+	}
+	ticketRes := model.TicketResponse{
+		Ticket:       ticket,
+		TicketExtend: ticketExtend,
+	}
+	return ticketRes, nil
 }

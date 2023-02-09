@@ -57,9 +57,14 @@ type PGInterface interface {
 	DeleteTimeFrameByParkingLotID(ctx context.Context, parkingLotID string, tx *gorm.DB) (err error)
 	//ticket
 	CreateTicket(ctx context.Context, req *model.Ticket, tx *gorm.DB) error
-	CancelTicket(ctx context.Context, req model.CancelTicketRequest, tx *gorm.DB) error
 	GetAllTicket(ctx context.Context, req model.GetListTicketParam, tx *gorm.DB) ([]model.Ticket, error)
+	GetOneTicket(ctx context.Context, id string, tx *gorm.DB) (model.Ticket, error)
+	GetOneTicketWithExtend(ctx context.Context, id string, tx *gorm.DB) (model.Ticket, error)
+	GetListExtendTicketByOrigin(ctx context.Context, idParent string, tx *gorm.DB) ([]model.Ticket, error)
+	UpdateTicket(ctx context.Context, ticket *model.Ticket, tx *gorm.DB) error
 
+	//ticket extend
+	CreateTicketExtend(ctx context.Context, req *model.TicketExtend, tx *gorm.DB) error
 	//long term ticket
 	CreateLongTermTicket(ctx context.Context, ltTicket *model.LongTermTicket, tx *gorm.DB) error
 
