@@ -3,6 +3,7 @@ package route
 import (
 	"fmt"
 	"github.com/caarlos0/env/v6"
+	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	swagger "github.com/swaggo/gin-swagger"
 	"gitlab.com/goxp/cloud0/ginext"
@@ -65,9 +66,24 @@ func NewService() *Service {
 	timeFrameHandler := handlers.NewTimeFrameHandler(timeFrameService)
 	ticketHandler := handlers.NewTicketHandler(ticketService)
 
-	v1Api := s.Router.Group("/api/v1")
-	swaggerApi := s.Router.Group("/")
+	route := s.Router
+	route.Use(func() gin.HandlerFunc {
+		return func(c *gin.Context) {
+			c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+			c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+			c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
+			c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT")
+			if c.Request.Method == "OPTIONS" {
+				c.AbortWithStatus(204)
+				return
+			}
+			c.Next()
+		}
+	}(),
+	)
 
+	v1Api := route.Group("/api/v1")
+	swaggerApi := route.Group("/")
 	// swagger
 	swaggerApi.GET("/swagger/*any", swagger.WrapHandler(swaggerFiles.Handler))
 
@@ -85,7 +101,7 @@ func NewService() *Service {
 
 	//favorite
 	v1Api.POST("/favorite/create", ginext.WrapHandler(favoriteHandler.Create))
-	v1Api.GET("/favorite/user/:idUser", ginext.WrapHandler(favoriteHandler.GetAllFavoriteParkingByUser))
+	v1Api.GET("/favorite/get-all", ginext.WrapHandler(favoriteHandler.GetAllFavoriteParkingByUser))
 	v1Api.DELETE("/favorite/delete/:id", ginext.WrapHandler(favoriteHandler.DeleteOne))
 
 	//time frame
@@ -128,7 +144,9 @@ func NewService() *Service {
 	//ticket
 	v1Api.POST("/ticket/create", ginext.WrapHandler(ticketHandler.CreateTicket))
 	v1Api.GET("/ticket/get-all", ginext.WrapHandler(ticketHandler.GetAllTicket))
+	v1Api.GET("/ticket/get-one-with-extend/:id", ginext.WrapHandler(ticketHandler.GetOneTicketWithExtend))
 	v1Api.POST("/ticket/cancel", ginext.WrapHandler(ticketHandler.CancelTicket))
+	v1Api.POST("/ticket/extend", ginext.WrapHandler(ticketHandler.ExtendTicket))
 
 	// Migrate
 	migrateHandler := handlers.NewMigrationHandler(db)

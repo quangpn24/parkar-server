@@ -44,12 +44,12 @@ func (h *FavoriteHandler) Create(r *ginext.Request) (*ginext.Response, error) {
 }
 func (h *FavoriteHandler) GetAllFavoriteParkingByUser(r *ginext.Request) (*ginext.Response, error) {
 	log := logger.WithCtx(r.GinCtx, utils.GetCurrentCaller(h, 0))
-	userId := utils.ParseIDFromUri(r.GinCtx)
-	if userId == nil {
-		log.Error("User id invalid!")
-		return nil, ginext.NewError(http.StatusBadRequest, "user id invalid!")
+	req := model.FavoriteRequestV2{}
+	if err := r.GinCtx.BindQuery(&req); err != nil {
+		log.WithError(err).Error("Error when parse req!")
+		return nil, ginext.NewError(http.StatusBadRequest, "Error when parse req: "+err.Error())
 	}
-	res, err := h.service.GetAllFavoriteParkingByUser(r.Context(), valid.UUID(userId).String())
+	res, err := h.service.GetAllFavoriteParkingByUser(r.Context(), valid.String(req.UserId))
 	if err != nil {
 		return nil, err
 	}

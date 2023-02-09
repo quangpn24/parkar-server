@@ -51,3 +51,14 @@ type TicketReq struct {
 	IsLongTerm    bool       `json:"isLongTerm"`
 	Type          string     `json:"type"`
 }
+type ExtendTicketReq struct {
+	TicketOriginId *uuid.UUID `json:"ticketOriginId" valid:"Required"`
+	TimeFrameId    *uuid.UUID `json:"timeFrameId" valid:"Required"`
+	StartTime      *time.Time `json:"startTime" valid:"Required"`
+	EndTime        *time.Time `json:"endTime" valid:"Required"`
+	Total          *float64   `json:"total"`
+}
+type TicketResponse struct {
+	Ticket
+	TicketExtend []Ticket `json:"ticketExtend"`
+}

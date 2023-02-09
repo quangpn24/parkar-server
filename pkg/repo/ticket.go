@@ -2,6 +2,7 @@ package repo
 
 import (
 	"context"
+	"errors"
 	"gitlab.com/goxp/cloud0/ginext"
 	"gitlab.com/goxp/cloud0/logger"
 	"gorm.io/gorm"
@@ -23,16 +24,14 @@ func (r *RepoPG) CreateTicket(ctx context.Context, ticket *model.Ticket, tx *gor
 	}
 	return nil
 }
-func (r *RepoPG) CancelTicket(ctx context.Context, req model.CancelTicketRequest, tx *gorm.DB) error {
-	log := logger.WithCtx(ctx, utils.GetCurrentCaller(r, 0))
+func (r *RepoPG) UpdateTicket(ctx context.Context, ticket *model.Ticket, tx *gorm.DB) error {
 	var cancel context.CancelFunc
 	if tx == nil {
 		tx, cancel = r.DBWithTimeout(ctx)
 		defer cancel()
 	}
-	if err := tx.Model(&model.Ticket{}).Where("id in ?", req.ListTicketId).Updates(map[string]interface{}{"state": "cancel"}).Error; err != nil {
-		log.WithError(err).Error("Error when cancel ticket - CreateTicket - RepoPG")
-		return ginext.NewError(http.StatusInternalServerError, "Error when cancel ticket: "+err.Error())
+	if err := tx.Model(&model.Ticket{}).Where("id = ?", ticket.ID).Updates(&ticket).Error; err != nil {
+		return ginext.NewError(http.StatusInternalServerError, "Error when update ticket: "+err.Error())
 	}
 	return nil
 }
@@ -48,10 +47,76 @@ func (r *RepoPG) GetAllTicket(ctx context.Context, req model.GetListTicketParam,
 		tx = tx.Where("state = ?", req.State)
 	}
 	if err := tx.Where("user_id = ?", req.UserId).Preload("Vehicle").Preload("ParkingLot").
-		Preload("ParkingSlot").Preload("ParkingSlot.Block").Preload("TimeFrame").
+		Preload("ParkingSlot", func(db *gorm.DB) *gorm.DB {
+			return db.Unscoped()
+		}).Preload("ParkingSlot.Block", func(db *gorm.DB) *gorm.DB {
+		return db.Unscoped()
+	}).Preload("TimeFrame").
 		Find(&res).Error; err != nil {
 		log.WithError(err).Error("Error when get all ticket - GetAllTicket - RepoPG")
 		return nil, ginext.NewError(http.StatusInternalServerError, "Error when get all ticket: "+err.Error())
+	}
+	return res, nil
+}
+func (r *RepoPG) GetOneTicket(ctx context.Context, id string, tx *gorm.DB) (model.Ticket, error) {
+	log := logger.WithCtx(ctx, utils.GetCurrentCaller(r, 0))
+	var cancel context.CancelFunc
+	if tx == nil {
+		tx, cancel = r.DBWithTimeout(ctx)
+		defer cancel()
+	}
+	var res model.Ticket
+	if err := tx.Model(&model.Ticket{}).Where("id = ?", id).Take(&res).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			log.WithError(err).Error("error_404: not found")
+			return res, ginext.NewError(http.StatusNotFound, err.Error())
+		}
+		log.WithError(err).Error("error_500: failed to GetOneTicket")
+		return res, ginext.NewError(http.StatusInternalServerError, err.Error())
+	}
+	return res, nil
+}
+func (r *RepoPG) GetOneTicketWithExtend(ctx context.Context, id string, tx *gorm.DB) (model.Ticket, error) {
+	log := logger.WithCtx(ctx, utils.GetCurrentCaller(r, 0))
+	var cancel context.CancelFunc
+	if tx == nil {
+		tx, cancel = r.DBWithTimeout(ctx)
+		defer cancel()
+	}
+	var res model.Ticket
+	if err := tx.Model(&model.Ticket{}).Where("id = ?", id).Preload("Vehicle").Preload("ParkingLot").
+		Preload("ParkingSlot", func(db *gorm.DB) *gorm.DB {
+			return db.Unscoped()
+		}).Preload("ParkingSlot.Block", func(db *gorm.DB) *gorm.DB {
+		return db.Unscoped()
+	}).Preload("TimeFrame").
+		Take(&res).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			log.WithError(err).Error("error_404: not found")
+			return res, ginext.NewError(http.StatusNotFound, err.Error())
+		}
+		log.WithError(err).Error("error_500: failed to GetOneTicket")
+		return res, ginext.NewError(http.StatusInternalServerError, err.Error())
+	}
+	return res, nil
+}
+func (r *RepoPG) GetListExtendTicketByOrigin(ctx context.Context, idParent string, tx *gorm.DB) ([]model.Ticket, error) {
+	log := logger.WithCtx(ctx, utils.GetCurrentCaller(r, 0))
+	var cancel context.CancelFunc
+	if tx == nil {
+		tx, cancel = r.DBWithTimeout(ctx)
+		defer cancel()
+	}
+	var res []model.Ticket
+	query := `select t.* from ticket_extend te
+			join ticket t on t.id = te.ticket_extend_id 
+            where te.ticket_id  = ? 
+              and t.deleted_at is null
+              and te.deleted_at is null
+              order by t.start_time asc`
+	if err := tx.Raw(query, idParent).Scan(&res).Error; err != nil {
+		log.WithError(err).Error("error_500: failed to GetOneTicket")
+		return res, ginext.NewError(http.StatusInternalServerError, err.Error())
 	}
 	return res, nil
 }

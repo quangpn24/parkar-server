@@ -94,10 +94,8 @@ func (r *RepoPG) GetAvailableParkingSlot(ctx context.Context, req model.Availabl
 										left join ticket t on
 											ps.id = t.parking_slot_id
 										where
-											(t.parking_lot_id = ? and (t.start_time > ? or t.end_time < ?))
+											t.state in ('completed', 'cancel') or (t.parking_lot_id = ? and (t.start_time > ? or t.end_time < ?))
 											or t.parking_lot_id is null
-											and t.state = 'new'
-											and t.deleted_at is null
 											and ps.deleted_at is null)
 									SELECT
 										sa.*,
