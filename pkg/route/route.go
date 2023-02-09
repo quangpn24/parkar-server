@@ -3,6 +3,7 @@ package route
 import (
 	"fmt"
 	"github.com/caarlos0/env/v6"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	swagger "github.com/swaggo/gin-swagger"
@@ -54,6 +55,7 @@ func NewService() *Service {
 	userService := service2.NewUserService(repoPG)
 	timeFrameService := service2.NewTimeFrameService(repoPG)
 	ticketService := service2.NewTicketService(repoPG)
+	companyService := service2.NewCompanyService(repoPG)
 
 	//handler
 	authHandler := handlers.NewAuthHandler(authService)
@@ -65,6 +67,7 @@ func NewService() *Service {
 	userHandler := handlers.NewUserHandler(userService)
 	timeFrameHandler := handlers.NewTimeFrameHandler(timeFrameService)
 	ticketHandler := handlers.NewTicketHandler(ticketService)
+	companyHanler := handlers.NewCompanyHandler(companyService)
 
 	route := s.Router
 	route.Use(func() gin.HandlerFunc {
@@ -82,8 +85,25 @@ func NewService() *Service {
 	}(),
 	)
 
-	v1Api := route.Group("/api/v1")
-	swaggerApi := route.Group("/")
+	route := s.Router
+	route.Use(func() gin.HandlerFunc {
+		return func(c *gin.Context) {
+			c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+			c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+			c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
+			c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT")
+			if c.Request.Method == "OPTIONS" {
+				c.AbortWithStatus(204)
+				return
+			}
+			c.Next()
+		}
+	}(),
+	)
+	v1Api := s.Router.Group("/api/v1")
+	merchantApi := s.Router.Group("/api/merchant")
+	swaggerApi := s.Router.Group("/")
+
 	// swagger
 	swaggerApi.GET("/swagger/*any", swagger.WrapHandler(swaggerFiles.Handler))
 
@@ -145,6 +165,18 @@ func NewService() *Service {
 	v1Api.GET("/ticket/get-one-with-extend/:id", ginext.WrapHandler(ticketHandler.GetOneTicketWithExtend))
 	v1Api.PUT("/ticket/cancel", ginext.WrapHandler(ticketHandler.CancelTicket))
 	v1Api.POST("/ticket/extend", ginext.WrapHandler(ticketHandler.ExtendTicket))
+
+	// company
+	merchantApi.POST("/company/create", cors.Default(), ginext.WrapHandler(companyHanler.CreateCompany))
+	merchantApi.POST("/company/login", cors.Default(), ginext.WrapHandler(companyHanler.Login))
+	merchantApi.GET("/company/get-one/:id", cors.Default(), ginext.WrapHandler(companyHanler.GetOneCompany))
+
+	merchantApi.GET("/parking-lot/get-list", ginext.WrapHandler(lotHandler.GetListParkingLotCompany))
+	merchantApi.GET("/parking-lot/get-one/:id", ginext.WrapHandler(lotHandler.GetOneParkingLot))
+
+	merchantApi.GET("/block/get-list", ginext.WrapHandler(blockHandler.GetListBlock))
+
+	merchantApi.GET("/time-frame/get-list", ginext.WrapHandler(timeFrameHandler.GetAllTimeFrame))
 
 	// Migrate
 	migrateHandler := handlers.NewMigrationHandler(db)

@@ -49,7 +49,7 @@ func (r *RepoPG) GetListBlock(ctx context.Context, req model.ListBlockReq) (res 
 	tx, cancel := r.DBWithTimeout(ctx)
 	defer cancel()
 
-	tx = tx.Model(&model.Block{})
+	tx = tx.Model(&model.Block{}).Where("parking_lot_id = ?", valid.String(req.ParkingLotID))
 
 	if req.Code != nil {
 		name := utils.TransformString(valid.String(req.Code), false)

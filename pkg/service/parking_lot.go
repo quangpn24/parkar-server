@@ -23,6 +23,11 @@ type ParkingLotInterface interface {
 	GetOneParkingLot(ctx context.Context, id uuid.UUID) (model.ParkingLot, error)
 	UpdateParkingLot(ctx context.Context, req model.ParkingLotReq) (model.ParkingLot, error)
 	DeleteParkingLot(ctx context.Context, id uuid.UUID) error
+	GetListParkingLotCompany(ctx context.Context, req model.GetListParkingLotReq) (model.ListParkingLotRes, error)
+}
+
+func (s *ParkingLotService) GetListParkingLotCompany(ctx context.Context, req model.GetListParkingLotReq) (res model.ListParkingLotRes, err error) {
+	return s.repo.GetListParkingLotCompany(ctx, req)
 }
 
 func (s *ParkingLotService) CreateParkingLot(ctx context.Context, req model.ParkingLotReq) (*model.ParkingLot, error) {
