@@ -151,5 +151,6 @@ func NewService() *Service {
 	// Migrate
 	migrateHandler := handlers.NewMigrationHandler(db)
 	s.Router.POST("/internal/migrate", migrateHandler.Migrate)
+	s.Router.Run("127.0.0.1:8088")
 	return s
 }
