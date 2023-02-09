@@ -47,3 +47,13 @@ type ListParkingLotRes struct {
 	Data []ParkingLot    `json:"data,omitempty"`
 	Meta ginext.BodyMeta `json:"meta" swaggertype:"object"`
 }
+
+type GetListParkingLotReq struct {
+	CompanyID *string `json:"company_id" form:"company_id"`
+	Name      *string `json:"name" form:"name"`
+	Lat       *string `json:"lat" form:"lat"`
+	Long      *string `json:"long" form:"long"`
+	Sort      string  `json:"sort" form:"sort"`
+	Page      int     `json:"page" form:"page"`
+	PageSize  int     `json:"pageSize" form:"pageSize"`
+}
