@@ -6,12 +6,12 @@ import (
 
 type User struct {
 	BaseModel
-	SocialID    string `json:"social_id"`
-	DisplayName string `json:"display_name"`
-	ImageUrl    string `json:"image_url"`
+	SocialID    string `json:"socialId"`
+	DisplayName string `json:"displayName"`
 	Email       string `json:"email"`
+	ImageUrl    string `json:"imageUrl"`
 	Password    string `json:"password" gorm:"not null"`
-	PhoneNumber string `json:"phone_number" gorm:"not null"`
+	PhoneNumber string `json:"phoneNumber" gorm:"not null"`
 }
 
 func (user *User) TableName() string {
@@ -23,10 +23,10 @@ type Credential struct {
 	Password *string `json:"password" valid:"Required"`
 }
 type LoginResponse struct {
-	AccessToken  string    `json:"access_token"`
-	RefreshToken string    `json:"refresh_token"`
-	PhoneNumber  string    `json:"phone_number"`
-	DisplayName  string    `json:"display_name"`
+	AccessToken  string    `json:"accessToken"`
+	RefreshToken string    `json:"refreshToken"`
+	PhoneNumber  string    `json:"phoneNumber"`
+	DisplayName  string    `json:"displayName"`
 	Id           uuid.UUID `json:"id"`
 }
 type CheckPhoneReq struct {
@@ -38,12 +38,11 @@ type UserReq struct {
 	ImageUrl    *string    `json:"image_url"`
 	Password    *string    `json:"password"`
 	PhoneNumber *string    `json:"phone_number"`
+	Email       *string    `json:"email"`
 }
-
-type UserReq struct {
-	ID          *uuid.UUID `json:"id,omitempty"`
-	DisplayName string     `json:"display_name"`
-	ImageUrl    string     `json:"image_url"`
-	Email       string     `json:"email"`
-	Password    string     `json:"password" gorm:"not null"`
+type CreateUserReq struct {
+	DisplayName *string `json:"display_name"`
+	Password    *string `json:"password" valid:"Required"`
+	PhoneNumber *string `json:"phone_number" valid:"Required"`
+	Email       *string `json:"email"`
 }

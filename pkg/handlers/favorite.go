@@ -57,17 +57,13 @@ func (h *FavoriteHandler) GetAllFavoriteParkingByUser(r *ginext.Request) (*ginex
 }
 func (h *FavoriteHandler) DeleteOne(r *ginext.Request) (*ginext.Response, error) {
 	log := logger.WithCtx(r.GinCtx, utils.GetCurrentCaller(h, 0))
-	req := model.FavoriteRequest{}
-	if err := r.GinCtx.BindJSON(&req); err != nil {
-		log.WithError(err).Error("Error when parse req - DeleteOne - FavoriteHandler")
-		return nil, ginext.NewError(http.StatusBadRequest, "Error when parse req: "+err.Error())
+	favoriteID := utils.ParseIDFromUri(r.GinCtx)
+	if favoriteID == nil {
+		log.Error("error_400: Wrong id ")
+		return nil, ginext.NewError(http.StatusBadRequest, "Wrong id")
 	}
-	//check valid
-	if err := utils.CheckRequireValid(req); err != nil {
-		log.WithError(err).Error("Invalid data! - DeleteOne - FavoriteHandler")
-		return nil, ginext.NewError(http.StatusBadRequest, "Invalid data: "+err.Error())
-	}
-	if err := h.service.DeleteOne(r.Context(), req); err != nil {
+
+	if err := h.service.DeleteOne(r.Context(), valid.UUID(favoriteID)); err != nil {
 		return nil, err
 	}
 	return ginext.NewResponse(http.StatusOK), nil

@@ -220,3 +220,35 @@ func (h *ParkingSlotHandler) DeleteParkingSlot(r *ginext.Request) (*ginext.Respo
 		Data: "Xóa bản ghi thành công",
 	}}, nil
 }
+
+func (h *ParkingSlotHandler) GetAvailableParkingSlot(r *ginext.Request) (*ginext.Response, error) {
+	log := logger.WithCtx(r.Context(), utils.GetCurrentCaller(h, 0))
+
+	// check x-user-id
+	_, err := utils.CurrentUser(r.GinCtx.Request)
+	if err != nil {
+		log.WithError(err).Error("error_401: Error when get current user")
+		return nil, ginext.NewError(http.StatusBadRequest, utils.MessageError()[http.StatusUnauthorized])
+	}
+
+	// parse & check valid request
+	var req model.AvailableParkingSlotReq
+	if err := r.GinCtx.BindQuery(&req); err != nil {
+		log.WithError(err).Error("error_400: Error when get parse req")
+		return nil, ginext.NewError(http.StatusBadRequest, err.Error())
+	}
+	if err := common.CheckRequireValid(req); err != nil {
+		log.WithError(err).Error("error_400: Fail to check require valid: ", err)
+		return nil, ginext.NewError(http.StatusBadRequest, err.Error())
+	}
+
+	res, err := h.service.GetAvailableParkingSlot(r.Context(), req)
+	if err != nil {
+		return nil, err
+	}
+
+	return &ginext.Response{Code: http.StatusOK, GeneralBody: &ginext.GeneralBody{
+		Data: res.Data,
+		Meta: res.Meta,
+	}}, nil
+}

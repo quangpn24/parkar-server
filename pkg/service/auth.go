@@ -23,6 +23,7 @@ func NewAuthService(repo repo.PGInterface) AuthServiceInterface {
 
 type AuthServiceInterface interface {
 	Login(ctx context.Context, req model.Credential) (interface{}, error)
+	ResetPassword(ctx context.Context, req model.Credential) error
 }
 
 func (s *AuthService) Login(ctx context.Context, req model.Credential) (interface{}, error) {
@@ -62,28 +63,21 @@ func (s *AuthService) Login(ctx context.Context, req model.Credential) (interfac
 	return res, nil
 }
 
-func (s *AuthService) Register(ctx context.Context, user model.User) (interface{}, error) {
+func (s *AuthService) ResetPassword(ctx context.Context, req model.Credential) error {
 	log := logger.WithCtx(ctx, utils.GetCurrentCaller(s, 0))
-	hashPass, err := bcrypt.GenerateFromPassword([]byte(user.Password), 10)
+	user, err := s.repo.GetOneUserByPhone(ctx, valid.String(req.UserName), nil)
+	if err != nil {
+		return err
+	}
+	hashPass, err := utils.Hash(valid.String(req.Password))
 	if err != nil {
 		log.WithError(err).Error("Failed to hash password")
-		return nil, ginext.NewError(http.StatusInternalServerError, "Failed to hash password")
+		return ginext.NewError(http.StatusInternalServerError, "Failed to hash password")
 	}
-	user.Password = string(hashPass)
+	user.Password = hashPass
 
-	//check duplicate phone number
-	oldUser, err := s.repo.GetOneUserByPhone(ctx, user.PhoneNumber, nil)
-	if err != nil {
-		log.WithError(err).Error("Err when check duplicate phone")
-		return nil, err
+	if err := s.repo.UpdateUser(ctx, user, nil); err != nil {
+		return err
 	}
-	if oldUser != nil {
-		return nil, ginext.NewError(http.StatusBadRequest, "Số điện thoại đã tồn tại ")
-	}
-
-	//create
-	if err := s.repo.CreateUser(ctx, &user, nil); err != nil {
-		return nil, err
-	}
-	return user, nil
+	return nil
 }

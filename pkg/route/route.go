@@ -52,6 +52,7 @@ func NewService() *Service {
 	vehicleService := service2.NewVehicleService(repoPG)
 	userService := service2.NewUserService(repoPG)
 	timeFrameService := service2.NewTimeFrameService(repoPG)
+	ticketService := service2.NewTicketService(repoPG)
 
 	//handler
 	authHandler := handlers.NewAuthHandler(authService)
@@ -62,6 +63,7 @@ func NewService() *Service {
 	vehicleHandler := handlers.NewVehicleHandler(vehicleService)
 	userHandler := handlers.NewUserHandler(userService)
 	timeFrameHandler := handlers.NewTimeFrameHandler(timeFrameService)
+	ticketHandler := handlers.NewTicketHandler(ticketService)
 
 	v1Api := s.Router.Group("/api/v1")
 	swaggerApi := s.Router.Group("/")
@@ -71,17 +73,20 @@ func NewService() *Service {
 
 	// auth
 	v1Api.POST("/user/login", ginext.WrapHandler(authHandler.Login))
+	v1Api.POST("/user/reset-password", ginext.WrapHandler(authHandler.ResetPassword))
+	//v1Api.POST("/user/create", ginext.WrapHandler(userHandler.))
 
 	//user
 	v1Api.GET("/user/:id", ginext.WrapHandler(userHandler.GetOneUserById))
+	v1Api.POST("/user/create", ginext.WrapHandler(userHandler.CreateUser))
 	v1Api.POST("/user/check-phone", ginext.WrapHandler(userHandler.CheckDuplicatePhone))
 	v1Api.PUT("/user/:id", ginext.WrapHandler(userHandler.UpdateUser))
 	v1Api.DELETE("/user/:id", ginext.WrapHandler(userHandler.DeleteUser))
 
 	//favorite
-	v1Api.POST("/favorite", ginext.WrapHandler(favoriteHandler.Create))
+	v1Api.POST("/favorite/create", ginext.WrapHandler(favoriteHandler.Create))
 	v1Api.GET("/favorite/user/:idUser", ginext.WrapHandler(favoriteHandler.GetAllFavoriteParkingByUser))
-	v1Api.DELETE("/favorite", ginext.WrapHandler(favoriteHandler.DeleteOne))
+	v1Api.DELETE("/favorite/delete/:id", ginext.WrapHandler(favoriteHandler.DeleteOne))
 
 	//time frame
 	v1Api.GET("/time-frame/get-all", ginext.WrapHandler(timeFrameHandler.GetAllTimeFrame))
@@ -104,19 +109,26 @@ func NewService() *Service {
 	v1Api.PUT("/block/update/:id", ginext.WrapHandler(blockHandler.UpdateBlock))
 	v1Api.DELETE("/block/delete/:id", ginext.WrapHandler(blockHandler.DeleteBlock))
 
-	// parking lot
+	// parking slot
 	v1Api.POST("/parking-slot/create", ginext.WrapHandler(slotHandler.CreateParkingSlot))
 	v1Api.GET("/parking-slot/get-one/:id", ginext.WrapHandler(slotHandler.GetOneParkingSlot))
 	v1Api.GET("/parking-slot/get-list", ginext.WrapHandler(slotHandler.GetListParkingSlot))
+	v1Api.GET("/parking-slot/available", ginext.WrapHandler(slotHandler.GetAvailableParkingSlot))
 	v1Api.PUT("/parking-slot/update/:id", ginext.WrapHandler(slotHandler.UpdateParkingSlot))
 	v1Api.DELETE("/parking-slot/delete/:id", ginext.WrapHandler(slotHandler.DeleteParkingSlot))
+	//v1Api.GET("/parking-slot/availability", ginext.WrapHandler(slotHandler.DeleteParkingSlot))
 
-	// parking lot
+	// vehicle
 	v1Api.POST("/vehicle/create", ginext.WrapHandler(vehicleHandler.CreateVehicle))
 	v1Api.GET("/vehicle/get-one/:id", ginext.WrapHandler(vehicleHandler.GetOneVehicle))
 	v1Api.GET("/vehicle/get-list", ginext.WrapHandler(vehicleHandler.GetListVehicle))
 	v1Api.PUT("/vehicle/update/:id", ginext.WrapHandler(vehicleHandler.UpdateVehicle))
 	v1Api.DELETE("/vehicle/delete/:id", ginext.WrapHandler(vehicleHandler.DeleteVehicle))
+
+	//ticket
+	v1Api.POST("/ticket/create", ginext.WrapHandler(ticketHandler.CreateTicket))
+	v1Api.GET("/ticket/get-all", ginext.WrapHandler(ticketHandler.GetAllTicket))
+	v1Api.POST("/ticket/cancel", ginext.WrapHandler(ticketHandler.CancelTicket))
 
 	// Migrate
 	migrateHandler := handlers.NewMigrationHandler(db)

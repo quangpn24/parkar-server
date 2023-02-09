@@ -26,7 +26,7 @@ type TimeFrameHandlerInterface interface {
 func (h *TimeFrameHandler) GetAllTimeFrame(r *ginext.Request) (*ginext.Response, error) {
 	log := logger.WithCtx(r.GinCtx, utils.GetCurrentCaller(h, 0))
 
-	req := model.GetListTimeFrameParam{}
+	var req model.GetListTimeFrameParam
 	if err := r.GinCtx.BindQuery(&req); err != nil {
 		log.WithError(err).Error("Error when parse req!")
 		return nil, ginext.NewError(http.StatusBadRequest, "Error when parse req: "+err.Error())

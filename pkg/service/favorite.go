@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"github.com/google/uuid"
 	"parkar-server/pkg/model"
 	"parkar-server/pkg/repo"
 	"parkar-server/pkg/valid"
@@ -18,7 +19,7 @@ func NewFavoriteService(repo repo.PGInterface) FavoriteServiceInterface {
 type FavoriteServiceInterface interface {
 	GetAllFavoriteParkingByUser(ctx context.Context, userId string) (res []model.Favorite, err error)
 	Create(ctx context.Context, req model.FavoriteRequest) (res *model.Favorite, err error)
-	DeleteOne(ctx context.Context, req model.FavoriteRequest) error
+	DeleteOne(ctx context.Context, id uuid.UUID) error
 }
 
 func (s *FavoriteService) Create(ctx context.Context, req model.FavoriteRequest) (res *model.Favorite, err error) {
@@ -43,8 +44,8 @@ func (s *FavoriteService) GetAllFavoriteParkingByUser(ctx context.Context, userI
 	return rs, nil
 }
 
-func (s *FavoriteService) DeleteOne(ctx context.Context, req model.FavoriteRequest) error {
-	if err := s.repo.DeleteOneFavorite(ctx, req, nil); err != nil {
+func (s *FavoriteService) DeleteOne(ctx context.Context, id uuid.UUID) error {
+	if err := s.repo.DeleteOneFavorite(ctx, id, nil); err != nil {
 		return err
 	}
 	return nil

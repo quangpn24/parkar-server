@@ -11,12 +11,11 @@ type ParkingLot struct {
 	Name        string    `json:"name" gorm:"not null"`
 	Description string    `json:"description"`
 	Address     string    `json:"address"`
-	StartTime   time.Time `json:"start_time"`
-	EndTime     time.Time `json:"end_time"`
+	StartTime   time.Time `json:"startTime"`
+	EndTime     time.Time `json:"endTime"`
 	Lat         string    `json:"lat"`
 	Long        string    `json:"long"`
-	IsActive    bool      `json:"is_active"`
-	CompanyID   uuid.UUID `json:"company_id"`
+	CompanyID   uuid.UUID `json:"companyID" gorm:"type:uuid"`
 }
 
 func (ParkingLot) TableName() string {
@@ -28,22 +27,20 @@ type ParkingLotReq struct {
 	Name        *string    `json:"name" valid:"Required"`
 	Description *string    `json:"description"`
 	Address     *string    `json:"address"`
-	StartTime   *time.Time `json:"start_time"`
-	EndTime     *time.Time `json:"end_time"`
+	StartTime   *time.Time `json:"startTime"`
+	EndTime     *time.Time `json:"endTime"`
 	Lat         *string    `json:"lat"`
 	Long        *string    `json:"long"`
-	IsActive    *bool      `json:"is_active"`
-	CompanyID   *uuid.UUID `json:"company_id"`
+	CompanyID   *uuid.UUID `json:"companyID"`
 }
 
 type ListParkingLotReq struct {
 	Name     *string `json:"name" form:"name"`
 	Lat      *string `json:"lat" form:"lat"`
 	Long     *string `json:"long" form:"long"`
-	IsActive *bool   `json:"is_active" form:"is_active"`
 	Sort     string  `json:"sort" form:"sort"`
 	Page     int     `json:"page" form:"page"`
-	PageSize int     `json:"page_size" form:"page_size"`
+	PageSize int     `json:"pageSize" form:"pageSize"`
 }
 
 type ListParkingLotRes struct {
