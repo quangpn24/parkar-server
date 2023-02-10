@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"parkar-server/pkg/model"
 	"parkar-server/pkg/repo"
+	"parkar-server/pkg/utils"
 	"parkar-server/pkg/valid"
 )
 
@@ -25,7 +26,8 @@ type CompanyInterface interface {
 	//GetListCompany(ctx context.Context, req model.ListCompanyReq) (model.ListCompanyRes, error)
 	LoginCompany(ctx context.Context, email string, password string) (model.Company, error)
 	GetOneCompany(ctx context.Context, id uuid.UUID) (model.Company, error)
-	//DeleteCompany(ctx context.Context, id uuid.UUID) error
+	UpdateCompany(ctx context.Context, id uuid.UUID, req model.CompanyReq) (model.Company, error)
+	UpdateCompanyPassword(ctx context.Context, id uuid.UUID, req model.PasswordChangeReq) (model.Company, error)
 }
 
 func (s *CompanyService) CreateCompany(ctx context.Context, req model.CompanyReq) (res model.Company, err error) {
@@ -47,9 +49,6 @@ func (s *CompanyService) CreateCompany(ctx context.Context, req model.CompanyReq
 	return company, nil
 }
 
-//	func (s *CompanyService) GetListCompany(ctx context.Context, req model.ListCompanyReq) (model.ListCompanyRes, error) {
-//		return s.repo.GetListCompany(ctx, req)
-//	}
 func (s *CompanyService) LoginCompany(ctx context.Context, email string, password string) (model.Company, error) {
 	company, err := s.repo.GetCompanyByEmail(ctx, email)
 	if err != nil {
@@ -70,21 +69,41 @@ func (s *CompanyService) GetOneCompany(ctx context.Context, id uuid.UUID) (model
 	return s.repo.GetOneCompany(ctx, id)
 }
 
-//
-//func (s *CompanyService) UpdateCompany(ctx context.Context, req model.CompanyReq) (model.Company, error) {
-//	Company, err := s.repo.GetOneCompany(ctx, valid.UUID(req.ID))
-//	if err != nil {
-//		return Company, err
-//	}
-//
-//	utils.Sync(req, &Company)
-//	if err := s.repo.UpdateCompany(ctx, &Company); err != nil {
-//		return Company, err
-//	}
-//
-//	return Company, nil
-//}
-//
-//func (s *CompanyService) DeleteCompany(ctx context.Context, id uuid.UUID) error {
-//	return s.repo.DeleteCompany(ctx, id)
-//}
+func (s *CompanyService) UpdateCompany(ctx context.Context, id uuid.UUID, req model.CompanyReq) (model.Company, error) {
+	company, err := s.repo.GetOneCompany(ctx, id)
+	if err != nil {
+		return company, err
+	}
+
+	utils.Sync(req, &company)
+
+	if err := s.repo.UpdateCompany(ctx, &company); err != nil {
+		return company, err
+	}
+
+	return company, nil
+}
+
+func (s *CompanyService) UpdateCompanyPassword(ctx context.Context, id uuid.UUID, req model.PasswordChangeReq) (model.Company, error) {
+	company, err := s.repo.GetOneCompany(ctx, id)
+	if err != nil {
+		return company, err
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(company.Password), []byte(valid.String(req.Old)))
+	if err != nil {
+		return company, ginext.NewError(http.StatusUnauthorized, "Incorrect password")
+	}
+
+	newPassword, err := bcrypt.GenerateFromPassword([]byte(valid.String(req.New)), 14)
+	if err != nil {
+		return company, err
+	}
+	utils.Sync(req, &company)
+	company.Password = string(newPassword)
+	if err := s.repo.UpdateCompany(ctx, &company); err != nil {
+		return company, err
+	}
+
+	return company, nil
+}

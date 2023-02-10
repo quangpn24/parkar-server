@@ -67,3 +67,25 @@ type ProcedureReq struct {
 	Type     string `json:"type"`
 	TicketId string `json:"ticketId"`
 }
+type GetListTicketReq struct {
+	ParkingLotID *string `json:"parking_lot_id" form:"parking_lot_id"`
+	State        *string `json:"state" form:"state"`
+}
+
+type GetListTicketRes struct {
+	ID            uuid.UUID    `json:"id"`
+	UserId        *uuid.UUID   `json:"userId"` // dung cho muc dich truy van
+	VehicleId     *uuid.UUID   `json:"vehicleId"`
+	Vehicle       *Vehicle     `json:"vehicle,omitempty"`
+	ParkingLotId  *uuid.UUID   `json:"parkingLotId"`
+	ParkingLot    *ParkingLot  `json:"parkingLot,omitempty"`
+	ParkingSlotId *uuid.UUID   `json:"parkingSlotId"`
+	ParkingSlot   *ParkingSlot `json:"parkingSlot,omitempty"`
+	StartTime     *time.Time   `json:"startTime"`
+	EndTime       *time.Time   `json:"endTime"`
+	EntryTime     *time.Time   `json:"entryTime,omitempty"`
+	ExitTime      *time.Time   `json:"exitTime,omitempty"`
+	Total         float64      `json:"total"`
+	State         string       `json:"state"`
+	IsExtend      bool         `json:"isExtend"`
+}

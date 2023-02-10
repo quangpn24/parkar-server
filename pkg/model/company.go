@@ -5,7 +5,7 @@ import "github.com/google/uuid"
 type Company struct {
 	BaseModel
 	Name        string `json:"name"`
-	PhoneNumber string `json:"phone_number" gorm:"not null"`
+	PhoneNumber string `json:"phoneNumber" gorm:"not null"`
 	Email       string `json:"email" gorm:"not null"`
 	Password    string `json:"password" gorm:"not null"`
 }
@@ -19,10 +19,15 @@ type CompanyReq struct {
 	Name        *string    `json:"companyName" valid:"Required"`
 	PhoneNumber *string    `json:"phoneNumber" valid:"Required"`
 	Email       *string    `json:"email" valid:"Required"`
-	Password    *string    `json:"password" valid:"Required"`
+	Password    *string    `json:"password"`
 }
 
 type LoginReq struct {
 	Email    *string `json:"email" valid:"Required"`
 	Password *string `json:"password" valid:"Required"`
+}
+
+type PasswordChangeReq struct {
+	Old *string `json:"old"`
+	New *string `json:"new"`
 }

@@ -37,8 +37,8 @@ func (s *ParkingLotService) CreateParkingLot(ctx context.Context, req model.Park
 		Address:     valid.String(req.Address),
 		StartTime:   valid.DayTime(req.StartTime),
 		EndTime:     valid.DayTime(req.EndTime),
-		Lat:         valid.String(req.Lat),
-		Long:        valid.String(req.Long),
+		Lat:         valid.Float64(req.Lat),
+		Long:        valid.Float64(req.Long),
 		CompanyID:   valid.UUID(req.CompanyID),
 	}
 
