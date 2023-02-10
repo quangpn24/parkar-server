@@ -62,6 +62,7 @@ type PGInterface interface {
 	GetOneTicketWithExtend(ctx context.Context, id string, tx *gorm.DB) (model.Ticket, error)
 	GetListExtendTicketByOrigin(ctx context.Context, idParent string, tx *gorm.DB) ([]model.Ticket, error)
 	UpdateTicket(ctx context.Context, ticket *model.Ticket, tx *gorm.DB) error
+	GetAllTicketCompany(ctx context.Context, req model.GetListTicketReq) (res []model.GetListTicketRes, err error)
 
 	//ticket extend
 	CreateTicketExtend(ctx context.Context, req *model.TicketExtend, tx *gorm.DB) error
@@ -75,6 +76,7 @@ type PGInterface interface {
 	CreateParkingLot(ctx context.Context, req *model.ParkingLot) error
 	GetOneParkingLot(ctx context.Context, id uuid.UUID) (model.ParkingLot, error)
 	GetListParkingLot(ctx context.Context, req model.ListParkingLotReq) (model.ListParkingLotRes, error)
+	GetListParkingLotCompany(ctx context.Context, req model.GetListParkingLotReq) (model.ListParkingLotRes, error)
 	UpdateParkingLot(ctx context.Context, req *model.ParkingLot) error
 	DeleteParkingLot(ctx context.Context, id uuid.UUID) error
 
@@ -99,6 +101,12 @@ type PGInterface interface {
 	GetListVehicle(ctx context.Context, req model.ListVehicleReq) (model.ListVehicleRes, error)
 	UpdateVehicle(ctx context.Context, req *model.Vehicle) error
 	DeleteVehicle(ctx context.Context, id uuid.UUID) error
+
+	// company
+	CreateCompany(ctx context.Context, req *model.Company) error
+	GetCompanyByEmail(ctx context.Context, email string) (model.Company, error)
+	GetOneCompany(ctx context.Context, id uuid.UUID) (model.Company, error)
+	UpdateCompany(ctx context.Context, req *model.Company) error
 }
 
 type RepoPG struct {

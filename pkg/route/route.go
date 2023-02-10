@@ -3,6 +3,7 @@ package route
 import (
 	"fmt"
 	"github.com/caarlos0/env/v6"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	swagger "github.com/swaggo/gin-swagger"
@@ -54,6 +55,7 @@ func NewService() *Service {
 	userService := service2.NewUserService(repoPG)
 	timeFrameService := service2.NewTimeFrameService(repoPG)
 	ticketService := service2.NewTicketService(repoPG)
+	companyService := service2.NewCompanyService(repoPG)
 
 	//handler
 	authHandler := handlers.NewAuthHandler(authService)
@@ -65,6 +67,7 @@ func NewService() *Service {
 	userHandler := handlers.NewUserHandler(userService)
 	timeFrameHandler := handlers.NewTimeFrameHandler(timeFrameService)
 	ticketHandler := handlers.NewTicketHandler(ticketService)
+	companyHanler := handlers.NewCompanyHandler(companyService)
 
 	route := s.Router
 	route.Use(func() gin.HandlerFunc {
@@ -82,8 +85,10 @@ func NewService() *Service {
 	}(),
 	)
 
-	v1Api := route.Group("/api/v1")
-	swaggerApi := route.Group("/")
+	v1Api := s.Router.Group("/api/v1")
+	merchantApi := s.Router.Group("/api/merchant")
+	swaggerApi := s.Router.Group("/")
+
 	// swagger
 	swaggerApi.GET("/swagger/*any", swagger.WrapHandler(swaggerFiles.Handler))
 
@@ -96,7 +101,7 @@ func NewService() *Service {
 	v1Api.GET("/user/:id", ginext.WrapHandler(userHandler.GetOneUserById))
 	v1Api.POST("/user/create", ginext.WrapHandler(userHandler.CreateUser))
 	v1Api.POST("/user/check-phone", ginext.WrapHandler(userHandler.CheckDuplicatePhone))
-	v1Api.PUT("/user/:id", ginext.WrapHandler(userHandler.UpdateUser))
+	v1Api.PUT("/user/update/:id", ginext.WrapHandler(userHandler.UpdateUser))
 	v1Api.DELETE("/user/:id", ginext.WrapHandler(userHandler.DeleteUser))
 
 	//favorite
@@ -108,8 +113,6 @@ func NewService() *Service {
 	v1Api.GET("/time-frame/get-all", ginext.WrapHandler(timeFrameHandler.GetAllTimeFrame))
 	v1Api.POST("/time-frame/create-multi", ginext.WrapHandler(timeFrameHandler.Create))
 	v1Api.PUT("/time-frame/update", ginext.WrapHandler(timeFrameHandler.Update))
-	// user
-	v1Api.PUT("/user/update/:id", ginext.WrapHandler(userHandler.UpdateUser))
 
 	// parking lot
 	v1Api.POST("/parking-lot/create", ginext.WrapHandler(lotHandler.CreateParkingLot))
@@ -145,12 +148,27 @@ func NewService() *Service {
 	v1Api.POST("/ticket/create", ginext.WrapHandler(ticketHandler.CreateTicket))
 	v1Api.GET("/ticket/get-all", ginext.WrapHandler(ticketHandler.GetAllTicket))
 	v1Api.GET("/ticket/get-one-with-extend/:id", ginext.WrapHandler(ticketHandler.GetOneTicketWithExtend))
-	v1Api.POST("/ticket/cancel", ginext.WrapHandler(ticketHandler.CancelTicket))
+	v1Api.PUT("/ticket/cancel", ginext.WrapHandler(ticketHandler.CancelTicket))
 	v1Api.POST("/ticket/extend", ginext.WrapHandler(ticketHandler.ExtendTicket))
+	v1Api.POST("/ticket/procedure", ginext.WrapHandler(ticketHandler.ProcedureWithTicket))
+
+	// company
+	merchantApi.POST("/company/create", cors.Default(), ginext.WrapHandler(companyHanler.CreateCompany))
+	merchantApi.PUT("/company/update/:id", cors.Default(), ginext.WrapHandler(companyHanler.UpdateCompany))
+	merchantApi.POST("/company/login", cors.Default(), ginext.WrapHandler(companyHanler.Login))
+	merchantApi.GET("/company/get-one/:id", cors.Default(), ginext.WrapHandler(companyHanler.GetOneCompany))
+	merchantApi.PUT("/company/update-password/:id", cors.Default(), ginext.WrapHandler(companyHanler.UpdateCompanyPassword))
+
+	merchantApi.GET("/parking-lot/get-list", ginext.WrapHandler(lotHandler.GetListParkingLotCompany))
+	merchantApi.GET("/parking-lot/get-one/:id", ginext.WrapHandler(lotHandler.GetOneParkingLot))
+
+	merchantApi.GET("/block/get-list", ginext.WrapHandler(blockHandler.GetListBlock))
+
+	merchantApi.GET("/time-frame/get-list", ginext.WrapHandler(timeFrameHandler.GetAllTimeFrame))
+	merchantApi.GET("/ticket/get-all", ginext.WrapHandler(ticketHandler.GetAllTicketCompany))
 
 	// Migrate
 	migrateHandler := handlers.NewMigrationHandler(db)
 	s.Router.POST("/internal/migrate", migrateHandler.Migrate)
-	s.Router.Run("127.0.0.1:8088")
 	return s
 }

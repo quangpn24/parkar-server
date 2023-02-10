@@ -80,8 +80,19 @@ func (s *UserService) UpdateUser(ctx context.Context, userReq model.UserReq) (*m
 	if err != nil {
 		return nil, err
 	}
+	if userReq.ImageUrl != nil {
+		user.ImageUrl = valid.String(userReq.ImageUrl)
+	}
+	if userReq.DisplayName != nil {
+		user.DisplayName = valid.String(userReq.DisplayName)
+	}
+	if userReq.Email != nil {
+		user.Email = valid.String(userReq.Email)
+	}
+	if userReq.PhoneNumber != nil {
+		user.PhoneNumber = valid.String(userReq.PhoneNumber)
+	}
 
-	utils.Sync(userReq, &user)
 	if err := s.repo.UpdateUser(ctx, user, nil); err != nil {
 		return nil, err
 	}

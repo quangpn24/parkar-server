@@ -28,16 +28,18 @@ type LoginResponse struct {
 	PhoneNumber  string    `json:"phoneNumber"`
 	DisplayName  string    `json:"displayName"`
 	Id           uuid.UUID `json:"id"`
+	Email        string    `json:"email"`
+	ImageUrl     string    `json:"imageUrl"`
 }
 type CheckPhoneReq struct {
 	PhoneNumber string `json:"phone_number" valid:"Required"`
 }
 type UserReq struct {
 	ID          *uuid.UUID `json:"id" valid:"Required"`
-	DisplayName *string    `json:"display_name"`
-	ImageUrl    *string    `json:"image_url"`
+	DisplayName *string    `json:"displayName"`
+	ImageUrl    *string    `json:"imageUrl"`
 	Password    *string    `json:"password"`
-	PhoneNumber *string    `json:"phone_number"`
+	PhoneNumber *string    `json:"phoneNumber"`
 	Email       *string    `json:"email"`
 }
 type CreateUserReq struct {
