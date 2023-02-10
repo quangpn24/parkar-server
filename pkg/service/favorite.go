@@ -19,6 +19,7 @@ func NewFavoriteService(repo repo.PGInterface) FavoriteServiceInterface {
 type FavoriteServiceInterface interface {
 	GetAllFavoriteParkingByUser(ctx context.Context, userId string) (res []model.Favorite, err error)
 	Create(ctx context.Context, req model.FavoriteRequest) (res *model.Favorite, err error)
+	GetOne(ctx context.Context, req model.FavoriteRequestV2) (res model.Favorite, err error)
 	DeleteOne(ctx context.Context, id uuid.UUID) error
 }
 
@@ -49,4 +50,11 @@ func (s *FavoriteService) DeleteOne(ctx context.Context, id uuid.UUID) error {
 		return err
 	}
 	return nil
+}
+func (s *FavoriteService) GetOne(ctx context.Context, req model.FavoriteRequestV2) (model.Favorite, error) {
+	res, err := s.repo.GetOne(ctx, req, nil)
+	if err != nil {
+		return res, err
+	}
+	return res, nil
 }

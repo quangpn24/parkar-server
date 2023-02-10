@@ -51,3 +51,17 @@ func (r *RepoPG) DeleteOneFavorite(ctx context.Context, id uuid.UUID, tx *gorm.D
 	}
 	return nil
 }
+func (r *RepoPG) GetOne(ctx context.Context, req model.FavoriteRequestV2, tx *gorm.DB) (model.Favorite, error) {
+	log := logger.WithCtx(ctx, utils.GetCurrentCaller(r, 0))
+	var cancel context.CancelFunc
+	if tx == nil {
+		tx, cancel = r.DBWithTimeout(ctx)
+		defer cancel()
+	}
+	var res model.Favorite
+	if err := tx.Where(" user_id= ? and parking_lot_id = ?", req.UserId, req.ParkingLotId).Take(&res).Error; err != nil {
+		log.WithError(err).Error("Error when delete favorite parking - DeleteOneFavorite - RepoPG")
+		return res, ginext.NewError(http.StatusInternalServerError, "Error when delete favorite parking: "+err.Error())
+	}
+	return res, nil
+}

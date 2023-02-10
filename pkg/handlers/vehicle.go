@@ -53,9 +53,7 @@ func (h *VehicleHandler) CreateVehicle(r *ginext.Request) (*ginext.Response, err
 	if err != nil {
 		return nil, err
 	}
-
 	return &ginext.Response{Code: http.StatusOK, GeneralBody: &ginext.GeneralBody{Data: res}}, nil
-
 }
 
 // GetListVehicle

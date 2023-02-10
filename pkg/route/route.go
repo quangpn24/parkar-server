@@ -107,6 +107,7 @@ func NewService() *Service {
 	//favorite
 	v1Api.POST("/favorite/create", ginext.WrapHandler(favoriteHandler.Create))
 	v1Api.GET("/favorite/get-all", ginext.WrapHandler(favoriteHandler.GetAllFavoriteParkingByUser))
+	v1Api.GET("/favorite/get-one", ginext.WrapHandler(favoriteHandler.GetOneFavoriteParking))
 	v1Api.DELETE("/favorite/delete/:id", ginext.WrapHandler(favoriteHandler.DeleteOne))
 
 	//time frame

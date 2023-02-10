@@ -123,7 +123,7 @@ func (h *TicketHandler) CancelTicket(r *ginext.Request) (*ginext.Response, error
 	if err != nil {
 		return nil, err
 	}
-	return ginext.NewResponse(http.StatusOK), nil
+	return ginext.NewResponseData(http.StatusOK, req.TicketId), nil
 }
 
 func (h *TicketHandler) GetAllTicketCompany(r *ginext.Request) (*ginext.Response, error) {

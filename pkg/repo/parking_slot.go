@@ -86,36 +86,34 @@ func (r *RepoPG) GetAvailableParkingSlot(ctx context.Context, req model.Availabl
 
 	tx = tx.Model(&model.ParkingSlot{})
 
-	query := utils.RemoveSpace(`WITH slot_avail as (
-										select
-											distinct ps.*
-										from
-											parking_slot ps
-										left join ticket t on
-											ps.id = t.parking_slot_id
-										where
-											t.state in ('completed', 'cancel') or (t.parking_lot_id = ? and (t.start_time > ? or t.end_time < ?))
-											or t.parking_lot_id is null
-											and ps.deleted_at is null)
-									SELECT
-										sa.*,
-										b.id  as "Block__id",
-										b.creator_id  as "Block__creator_id",
-										b.updater_id  as "Block__updater_id",
-										b.created_at  as "Block__created_at",
-										b.updated_at  as "Block__updated_at",
-										b.deleted_at  as "Block__deleted_at",
-										b.code  as "Block__code",
-										b.description  as "Block__description",
-										b.slot  as "Block__slot",
-										b.parking_lot_id  as "Block__parking_lot_id" 
-									FROM
-										slot_avail sa
-									JOIN block b on sa.block_id = b.id 
-									ORDER BY b.code, sa.created_at `)
+	query := utils.RemoveSpace(`select
+										sl.*,
+										b.id as "Block__id",
+										b.creator_id as "Block__creator_id",
+										b.updater_id as "Block__updater_id",
+										b.created_at as "Block__created_at",
+										b.updated_at as "Block__updated_at",
+										b.deleted_at as "Block__deleted_at",
+										b.code as "Block__code",
+										b.description as "Block__description",
+										b.slot as "Block__slot",
+										b.parking_lot_id as "Block__parking_lot_id"
+									from
+										parking_slot sl
+									join block b on sl.block_id = b.id
+									where sl.id  not in ( select t.parking_slot_id as id 
+									                      from ticket t
+															where t.state in ('new', 'extend', 'ongoing')
+															  and t.parking_lot_id = ?
+															  and t.start_time < ?
+															  and t.end_time > ?) 
+									  and b.parking_lot_id = ?
+									order by
+										b.code,
+										sl.created_at`)
 	req.Start = valid.DayTimePointer(valid.DayTime(req.Start).Add(1 * time.Second))
 	req.End = valid.DayTimePointer(valid.DayTime(req.End).Add(-1 * time.Second))
-	if err := tx.Raw(query, req.ParkingLotId, req.End, req.Start).Scan(&res.Data).Error; err != nil {
+	if err := tx.Raw(query, req.ParkingLotId, req.End, req.Start, req.ParkingLotId).Scan(&res.Data).Error; err != nil {
 		log.WithError(err).Error("error_500: failed to GetAvailableParkingSlot")
 		return res, ginext.NewError(http.StatusInternalServerError, err.Error())
 	}
