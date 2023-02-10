@@ -21,6 +21,7 @@ func NewTicketHandler(service service.TicketServiceInterface) TicketHandlerInter
 type TicketHandlerInterface interface {
 	CreateTicket(r *ginext.Request) (*ginext.Response, error)
 	GetAllTicket(r *ginext.Request) (*ginext.Response, error)
+	ProcedureWithTicket(r *ginext.Request) (*ginext.Response, error)
 	GetOneTicketWithExtend(r *ginext.Request) (*ginext.Response, error)
 	CancelTicket(r *ginext.Request) (*ginext.Response, error)
 	ExtendTicket(r *ginext.Request) (*ginext.Response, error)
@@ -40,6 +41,19 @@ func (h *TicketHandler) CreateTicket(r *ginext.Request) (*ginext.Response, error
 		return nil, ginext.NewError(http.StatusBadRequest, "Error when parse req: "+err.Error())
 	}
 	res, err := h.service.CreateTicket(r.Context(), &req)
+	if err != nil {
+		return nil, err
+	}
+	return ginext.NewResponseData(http.StatusCreated, res), nil
+}
+func (h *TicketHandler) ProcedureWithTicket(r *ginext.Request) (*ginext.Response, error) {
+	log := logger.WithCtx(r.GinCtx, utils.GetCurrentCaller(h, 0))
+	req := model.ProcedureReq{}
+	if err := r.GinCtx.BindJSON(&req); err != nil {
+		log.WithError(err).Error("Error when parse req!")
+		return nil, ginext.NewError(http.StatusBadRequest, "Error when parse req: "+err.Error())
+	}
+	res, err := h.service.ProcedureWithTicket(r.Context(), &req)
 	if err != nil {
 		return nil, err
 	}

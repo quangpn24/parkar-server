@@ -62,3 +62,8 @@ type TicketResponse struct {
 	Ticket
 	TicketExtend []Ticket `json:"ticketExtend"`
 }
+
+type ProcedureReq struct {
+	Type     string `json:"type"`
+	TicketId string `json:"ticketId"`
+}

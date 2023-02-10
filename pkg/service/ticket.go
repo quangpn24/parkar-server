@@ -5,6 +5,7 @@ import (
 	"parkar-server/pkg/model"
 	"parkar-server/pkg/repo"
 	"parkar-server/pkg/valid"
+	"time"
 )
 
 type TicketService struct {
@@ -17,6 +18,7 @@ func NewTicketService(repo repo.PGInterface) TicketServiceInterface {
 
 type TicketServiceInterface interface {
 	CreateTicket(ctx context.Context, req *model.TicketReq) (*model.Ticket, error)
+	ProcedureWithTicket(ctx context.Context, req *model.ProcedureReq) (bool, error)
 	ExtendTicket(ctx context.Context, req *model.ExtendTicketReq) (*model.TicketExtend, error)
 	GetAllTicket(ctx context.Context, req model.GetListTicketParam) ([]model.Ticket, error)
 	GetOneTicketWithExtend(ctx context.Context, id string) (model.TicketResponse, error)
@@ -137,4 +139,22 @@ func (s *TicketService) CancelTicket(ctx context.Context, id string) error {
 		return err
 	}
 	return nil
+}
+func (s *TicketService) ProcedureWithTicket(ctx context.Context, req *model.ProcedureReq) (bool, error) {
+	ticket, err := s.repo.GetOneTicket(ctx, req.TicketId, nil)
+	if err != nil {
+		return false, err
+	}
+	switch req.Type {
+	case "check_in":
+		ticket.State = "ongoing"
+		ticket.EntryTime = valid.DayTimePointer(time.Now())
+	case "check_out":
+		ticket.State = "completed"
+		ticket.ExitTime = valid.DayTimePointer(time.Now())
+	}
+	if err := s.repo.UpdateTicket(ctx, &ticket, nil); err != nil {
+		return false, err
+	}
+	return true, nil
 }
