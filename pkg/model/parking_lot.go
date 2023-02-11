@@ -38,6 +38,7 @@ type ListParkingLotReq struct {
 	Name     *string  `json:"name" form:"name"`
 	Lat      *float64 `json:"lat" form:"lat"`
 	Long     *float64 `json:"long" form:"long"`
+	Distance *float64 `json:"distance" form:"distance"`
 	Sort     string   `json:"sort" form:"sort"`
 	Page     int      `json:"page" form:"page"`
 	PageSize int      `json:"pageSize" form:"pageSize"`

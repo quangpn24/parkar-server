@@ -56,6 +56,10 @@ func (r *RepoPG) GetListParkingLot(ctx context.Context, req model.ListParkingLot
 		tx = tx.Where("unaccent(name) ilike ?", name+"%")
 	}
 
+	if req.Distance != nil && req.Lat != nil && req.Long != nil {
+		tx = tx.Where("round(cast(ST_DistanceSphere(ST_MakePoint(long , lat),ST_MakePoint( ?,?)) As numeric)/1000.0,1) < ?", req.Long, req.Lat, req.Distance)
+	}
+
 	if req.Sort != "" {
 		tx = tx.Order(req.Sort)
 	} else {
