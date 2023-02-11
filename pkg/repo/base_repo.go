@@ -56,6 +56,12 @@ type PGInterface interface {
 	GetAllTimeFrame(ctx context.Context, req model.GetListTimeFrameParam, tx *gorm.DB) (res *model.ListTimeFrame, err error)
 	CreateMultiTimeFrame(ctx context.Context, timeFrame []model.TimeFrame, tx *gorm.DB) (err error)
 	DeleteTimeFrameByParkingLotID(ctx context.Context, parkingLotID string, tx *gorm.DB) (err error)
+
+	CreateTimeframe(ctx context.Context, req *model.TimeFrame) error
+	GetOneTimeframe(ctx context.Context, id uuid.UUID) (model.TimeFrame, error)
+	UpdateTimeframe(ctx context.Context, req *model.TimeFrame) error
+	DeleteTimeframe(ctx context.Context, id uuid.UUID) error
+
 	//ticket
 	CreateTicket(ctx context.Context, req *model.Ticket, tx *gorm.DB) error
 	GetAllTicket(ctx context.Context, req model.GetListTicketParam, tx *gorm.DB) ([]model.Ticket, error)

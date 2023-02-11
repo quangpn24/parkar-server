@@ -29,3 +29,9 @@ type GetListTimeFrameParam struct {
 type ListTimeFrame struct {
 	Data []TimeFrame `json:"data"`
 }
+
+type TimeFrameRequest struct {
+	Duration     *int       `json:"duration" valid:"Required"`
+	Cost         *float64   `json:"cost" valid:"Required"`
+	ParkingLotId *uuid.UUID `json:"parkingLotId" valid:"Required"`
+}
