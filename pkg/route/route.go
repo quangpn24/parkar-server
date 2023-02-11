@@ -75,7 +75,7 @@ func NewService() *Service {
 			c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
 			c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
 			c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
-			c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT")
+			c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT, DELETE")
 			if c.Request.Method == "OPTIONS" {
 				c.AbortWithStatus(204)
 				return
@@ -113,6 +113,11 @@ func NewService() *Service {
 	v1Api.GET("/time-frame/get-all", ginext.WrapHandler(timeFrameHandler.GetAllTimeFrame))
 	v1Api.POST("/time-frame/create-multi", ginext.WrapHandler(timeFrameHandler.Create))
 	v1Api.PUT("/time-frame/update", ginext.WrapHandler(timeFrameHandler.Update))
+
+	v1Api.POST("/time-frame/create", ginext.WrapHandler(timeFrameHandler.CreateTimeFrame))
+	v1Api.GET("/time-frame/get-one/:id", ginext.WrapHandler(timeFrameHandler.GetOneTimeFrame))
+	v1Api.PUT("/time-frame/update/:id", ginext.WrapHandler(timeFrameHandler.UpdateTimeFrame))
+	v1Api.DELETE("/time-frame/delete/:id", ginext.WrapHandler(timeFrameHandler.DeleteTimeFrame))
 
 	// parking lot
 	v1Api.POST("/parking-lot/create", ginext.WrapHandler(lotHandler.CreateParkingLot))
